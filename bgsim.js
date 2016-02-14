@@ -259,6 +259,9 @@
                 case 'mouseup':
                 case 'touchend':
                     return this.dragend(point);
+
+                case 'touchcancel':
+                    return false;
             }
         };
 
@@ -443,6 +446,7 @@
                 events.push(['touchstart', this.touchEventSender]);
                 events.push(['touchmove', this.touchEventSender]);
                 events.push(['touchend', this.touchEventSender]);
+                events.push(['touchcancel', this.touchEventSender]);
             } else {
                 events.push(['mousedown', this.mouseEventSender]);
                 events.push(['mousemove', this.mouseEventSender]);
