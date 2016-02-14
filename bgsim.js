@@ -629,7 +629,6 @@
         Board.prototype._draw = function (context)
         {
             this.image.draw(context, this.sprite, this.rectangle.size);
-            context.strokeRect(-this.rectangle.half_width, -this.rectangle.half_height, this.rectangle.width, this.rectangle.height);
         };
 
         Board.prototype.__defineSetter__('image', function (image) {
