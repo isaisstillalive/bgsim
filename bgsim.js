@@ -501,6 +501,11 @@
                 if (component != null) {
                     point = component.point;
                     component = component.component;
+                    for (var i in this.listeners) {
+                        if (this.listeners[i] === component) {
+                            return;
+                        }
+                    };
                 }
             } else {
                 console.log('usecache:'+id);
