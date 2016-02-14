@@ -800,15 +800,15 @@
         this.min = options.min || 0;
         this.step = options.step || -1;
         this.current = options.current || (this.step > 0 ? this.min : this.max);
-        this.image = options.image;
+        this.source = options.source;
     }
     {
         inherits(Counter, Component);
 
         Counter.prototype._draw = function (context)
         {
-            if (this.image) {
-                this.image.draw(context, this.current, this.rectangle.size);
+            if (this.source && this.source instanceof bgsim.Image) {
+                this.source.draw(context, this.current, this.rectangle.size);
             } else {
                 context.save();
                 context.fillStyle = '#fff';
@@ -818,7 +818,11 @@
                 context.font = '80px monospace';
                 context.textAlign = 'center';
                 context.fillStyle = '#000';
-                context.fillText(this.current, 0, 30, 100);
+                if (this.source instanceof Array && this.source[this.current] !== undefined) {
+                    context.fillText(this.source[this.current], 0, 30, this.rectangle.width);
+                } else {
+                    context.fillText(this.current, 0, 30, this.rectangle.width);
+                }
                 context.restore();
             }
         };
