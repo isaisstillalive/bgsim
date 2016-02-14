@@ -437,14 +437,13 @@
     {
         inherits(Game, ComponentSet);
 
-        Game.prototype.start = function (canvas)
+        Game.prototype.start = function (canvas, init)
         {
-            var isTouch = ('ontouchstart' in window);
-
             this.canvas = canvas;
             this.context = this.canvas.getContext('2d');
             this.zoom = window.devicePixelRatio/2;
             this.listeners = {};
+            this.init = init;
 
             canvas.style.width = window.innerWidth + 'px';
             canvas.style.height = window.innerHeight + 'px';
@@ -473,8 +472,19 @@
                 self.canvas.addEventListener(data[0], function(e){ return data[1].call(self, e); }, false);
             });
 
+            this.init();
             this.draw();
         };
+
+
+        Game.prototype.reset = function ()
+        {
+            for (var i = this.components.length; i--;) {
+                this.components[i];
+            }
+            this.components = [];
+            this.init();
+        }
 
         Game.prototype.draw = function ()
         {
