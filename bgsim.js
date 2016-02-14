@@ -829,9 +829,19 @@
             this.next();
         };
 
+        Counter.prototype.hold = function ()
+        {
+            this.prev();
+        };
+
         Counter.prototype.next = function ()
         {
             this.current = this.min + (this.current - this.min + this.step + this.range) % this.range;
+        };
+
+        Counter.prototype.prev = function ()
+        {
+            this.current = this.min + (this.current - this.min - this.step + this.range) % this.range;
         };
 
         Counter.prototype.__defineSetter__('max', function(max){
