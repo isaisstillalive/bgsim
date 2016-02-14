@@ -577,6 +577,38 @@
         inherits(Player, ComponentSet);
     }
 
+    // class Label extends Component
+    var Label = bgsim.Label = function (text, options)
+    {
+        if (!options) {
+            options = {}
+        }
+        if (options.doubletapable == undefined) {
+            options.doubletapable = false;
+        }
+
+        Component.call(this, options);
+        this.text = text;
+        // this.sprite = options.sprite;
+    }
+    {
+        inherits(Label, Component);
+
+        Label.prototype._draw = function (context)
+        {
+            context.save();
+            context.fillStyle = '#fff';
+            context.fillRect(-this.rectangle.half_width, -this.rectangle.half_height, this.rectangle.width, this.rectangle.height);
+            context.strokeStyle = '#000';
+            context.strokeRect(-this.rectangle.half_width, -this.rectangle.half_height, this.rectangle.width, this.rectangle.height);
+            context.font = '80px monospace';
+            context.textAlign = 'center';
+            context.fillStyle = '#000';
+            context.fillText(this.text, 0, 30, this.rectangle.width);
+            context.restore();
+        };
+    }
+
     // class Board extends Component
     var Board = bgsim.Board = function (image, options)
     {
