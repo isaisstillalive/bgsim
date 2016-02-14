@@ -811,11 +811,13 @@
             var self = this;
             var x = this.rectangle.x;
             var y = this.rectangle.y;
+            var angle = this.angle;
 
             var rolling = function(count) {
                 if (count < 0) {
                     self.rectangle.x = x;
                     self.rectangle.y = y;
+                    self.angle = angle;
                     return;
                 }
 
@@ -823,6 +825,7 @@
                 if (self.jiggle > 0) {
                     self.rectangle.x = x - self.jiggle + Math.floor(Math.random() * (self.jiggle*2+1));
                     self.rectangle.y = y - self.jiggle + Math.floor(Math.random() * (self.jiggle*2+1));
+                    self.angle = angle - self.jiggle + Math.floor(Math.random() * (self.jiggle*2+1));
                 }
                 setTimeout(rolling, 30, count-1);
             };
