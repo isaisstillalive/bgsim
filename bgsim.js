@@ -284,18 +284,19 @@
         {
             this.control.isClick = true;
 
+            var self = this;
+            this.control.holding = window.setTimeout(function(){
+                self.control.holding = null;
+                self.control.draging = null;
+                self.control.isClick = null;
+                self.hold();
+            }, 500);
+
             if (this.draggable) {
                 this.control.draging = {
                     x: this.rectangle.x - point.x,
                     y: this.rectangle.y - point.y,
                 };
-                var self = this;
-                this.control.holding = window.setTimeout(function(){
-                    self.control.holding = null;
-                    self.control.draging = null;
-                    self.control.isClick = null;
-                    self.hold();
-                }, 500);
                 var i = this.parent.components.indexOf(this);
                 this.parent.components.splice(i, 1);
                 this.parent.components.push(this);
