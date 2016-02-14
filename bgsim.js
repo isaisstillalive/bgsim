@@ -742,10 +742,15 @@
         this.back = !!options.back;
         this.thick = options.thick || 0;
 
+        var copyFunc = options.copy || function(i, card){};
+
+        var count = 0;
         for (var i = 0; i < cards.length; i++) {
             var card = cards[i][0];
             for (var c = cards[i][1]; c--;) {
-                this.push(card.copy());
+                var copyCard = card.copy();
+                copyFunc.call(copyCard, count++, card);
+                this.push(copyCard);
             };
         }
 
