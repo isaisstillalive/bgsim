@@ -1,6 +1,8 @@
 (function(window){
     "use strict";
 
+    var isTouch = ('ontouchstart' in window);
+
     window.bgsim = {};
 
     function inherits (childCtor, parentCtor) {
@@ -11,6 +13,19 @@
         childCtor.prototype = new tempCtor();
         /** @override */
         childCtor.prototype.constructor = childCtor;
+    }
+
+    if (isTouch) {
+        window.addEventListener('load', function () {
+            var cons = document.getElementById('console');
+            if (cons) {
+                var rows = cons.getAttribute('rows')-1 || 1;
+                console.log = function (val) {
+                    var l = cons.innerHTML.split("\n", rows);
+                    cons.innerHTML = val + "\n" + l.join("\n");
+                }
+            }
+        });
     }
 
     var Point = function (x, y)
