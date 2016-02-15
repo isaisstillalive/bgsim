@@ -423,7 +423,6 @@
         this.backgroundColor = options.backgroundColor || null;
 
         this.components = [];
-        this.listeners = {};
     }
     {
         inherits(ComponentSet, Component);
@@ -480,7 +479,7 @@
             this.canvas = canvas;
             this.context = this.canvas.getContext('2d');
             this.zoom = window.devicePixelRatio/2;
-            this.listeners = {};
+            this.listeningComponent = {};
             this.init = init;
 
             canvas.style.width = window.innerWidth + 'px';
@@ -564,13 +563,13 @@
         {
             var component = null;
 
-            if (this.listeners[id] == undefined) {
+            if (this.listeningComponent[id] == undefined) {
                 component = this.getComponentFromPoint(point);
                 if (component != null) {
                     point = component.point;
                     component = component.component;
-                    for (var i in this.listeners) {
-                        if (this.listeners[i] === component) {
+                    for (var i in this.listeningComponent) {
+                        if (this.listeningComponent[i] === component) {
                             return;
                         }
                     };
@@ -579,7 +578,7 @@
                 console.log('usecache:'+id);
                 $('#console').val('usecache:' + id);
 
-                component = this.listeners[id];
+                component = this.listeningComponent[id];
                 point = component.getAllLocalPoint(point);
             }
 
@@ -588,11 +587,11 @@
                 if (result === true) {
                     console.log('cache:'+id);
                     $('#console').val('cache:' + id);
-                    this.listeners[id] = component;
+                    this.listeningComponent[id] = component;
                 } else if (result === false) {
                     console.log('discache:'+id);
                     $('#console').val('discache:' + id);
-                    delete this.listeners[id];
+                    delete this.listeningComponent[id];
                 }
                 return result;
             }
