@@ -212,6 +212,7 @@
         this.angle = options.angle || 0;
 
         this.draggable = !!options.draggable;
+        this.holdable = !!options.holdable;
         this.doubletapable = !!options.doubletapable;
 
         this.eventListeners = {};
@@ -356,12 +357,14 @@
             this.control.isClick = true;
 
             var self = this;
-            this.control.holding = window.setTimeout(function(){
-                self.control.holding = null;
-                self.control.draging = null;
-                self.control.isClick = null;
-                self.hold();
-            }, 500);
+            if (this.holdable) {
+                this.control.holding = window.setTimeout(function(){
+                    self.control.holding = null;
+                    self.control.draging = null;
+                    self.control.isClick = null;
+                    self.hold();
+                }, 500);
+            }
 
             if (this.draggable) {
                 this.control.draging = {
@@ -710,6 +713,9 @@
         if (options.doubletapable == undefined) {
             options.doubletapable = true;
         }
+        if (options.holdable == undefined) {
+            options.holdable = true;
+        }
         Board.call(this, frontImage, options);
 
         this.backImageRaw = backImage;
@@ -850,7 +856,12 @@
         }
         options.width = options.width || 50;
         options.height = options.height || 50;
+
         options.doubletapable = false;
+        if (options.holdable == undefined) {
+            options.holdable = true;
+        }
+
         Component.call(this, options);
 
         this._min = 0;
@@ -936,6 +947,7 @@
         if (options === undefined) {
             options = {}
         }
+        options.holdable = false;
         options.max = options.max || 6;
         options.min = options.min || 1;
         Counter.call(this, options);
