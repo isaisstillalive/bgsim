@@ -1,11 +1,14 @@
 (function(window){
     "use strict";
 
-    var isTouch = ('ontouchstart' in window);
-
     window.bgsim = {};
 
-    function inherits (childCtor, parentCtor) {
+    var util = {
+        isTouch: ('ontouchstart' in window),
+    };
+
+    util.inherits = function (childCtor, parentCtor)
+    {
         /** @constructor */
         function tempCtor() {};
         tempCtor.prototype = parentCtor.prototype;
@@ -15,7 +18,7 @@
         childCtor.prototype.constructor = childCtor;
     }
 
-    function getRandom(min, max)
+    util.getRandom = function (min, max)
     {
         if (max == undefined) {
             max = min;
@@ -24,7 +27,7 @@
         return min + Math.floor(Math.random() * (max - min + 1));
     }
 
-    if (isTouch) {
+    if (util.isTouch) {
         window.addEventListener('load', function () {
             var cons = document.getElementById('console');
             if (cons) {
@@ -449,7 +452,7 @@
         this.components = [];
     }
     {
-        inherits(bgsim.ComponentSet, bgsim.Component);
+        util.inherits(bgsim.ComponentSet, bgsim.Component);
 
         bgsim.ComponentSet.prototype.push = function (component)
         {
@@ -496,7 +499,7 @@
         bgsim.ComponentSet.call(this, options);
     }
     {
-        inherits(Game, bgsim.ComponentSet);
+        util.inherits(Game, bgsim.ComponentSet);
 
         Game.prototype.start = function (canvas, init)
         {
@@ -518,7 +521,7 @@
             this.rectangle.size.height = window.innerHeight;
 
             var events = [];
-            if (isTouch) {
+            if (util.isTouch) {
                 events.push(['touchstart', this.touchEventSender]);
                 events.push(['touchmove', this.touchEventSender]);
                 events.push(['touchend', this.touchEventSender]);
@@ -639,7 +642,7 @@
         // this.sprite = options.sprite;
     }
     {
-        inherits(bgsim.Label, bgsim.Component);
+        util.inherits(bgsim.Label, bgsim.Component);
 
         bgsim.Label.prototype._draw = function (context)
         {
@@ -671,7 +674,7 @@
         this.sprite = options.sprite;
     }
     {
-        inherits(bgsim.Board, bgsim.Component);
+        util.inherits(bgsim.Board, bgsim.Component);
 
         bgsim.Board.prototype._draw = function (context)
         {
@@ -721,7 +724,7 @@
         this.sleep = !!options.sleep;
     }
     {
-        inherits(bgsim.Card, bgsim.Board);
+        util.inherits(bgsim.Card, bgsim.Board);
 
         bgsim.Card.prototype.copy = function ()
         {
@@ -809,7 +812,7 @@
         this.reset();
     }
     {
-        inherits(bgsim.Deck, bgsim.ComponentSet);
+        util.inherits(bgsim.Deck, bgsim.ComponentSet);
 
         bgsim.Deck.prototype.reset = function ()
         {
@@ -827,7 +830,7 @@
         bgsim.Deck.prototype.shuffle = function ()
         {
             for (var dst = this.components.length; dst--;) {
-                var src = getRandom(dst);
+                var src = util.getRandom(dst);
                 var card = this.components[dst];
                 this.components[dst] = this.components[src];
                 this.components[src] = card;
@@ -860,7 +863,7 @@
         this.source = options.source;
     }
     {
-        inherits(bgsim.Counter, bgsim.Component);
+        util.inherits(bgsim.Counter, bgsim.Component);
 
         bgsim.Counter.prototype._draw = function (context)
         {
@@ -942,11 +945,11 @@
         this.jiggle = options.jiggle || 0;
     }
     {
-        inherits(bgsim.Dice, bgsim.Counter);
+        util.inherits(bgsim.Dice, bgsim.Counter);
 
         bgsim.Dice.prototype.next = function ()
         {
-            this.step = getRandom(this.min, this.max);
+            this.step = util.getRandom(this.min, this.max);
             bgsim.Counter.prototype.next.call(this);
         };
 
@@ -968,9 +971,9 @@
 
                 self.next();
                 if (self.jiggle > 0) {
-                    self.rectangle.point.x = x + getRandom(-self.jiggle, self.jiggle);
-                    self.rectangle.point.y = y + getRandom(-self.jiggle, self.jiggle);
-                    self.angle = angle + getRandom(-self.jiggle, self.jiggle);
+                    self.rectangle.point.x = x + util.getRandom(-self.jiggle, self.jiggle);
+                    self.rectangle.point.y = y + util.getRandom(-self.jiggle, self.jiggle);
+                    self.angle = angle + util.getRandom(-self.jiggle, self.jiggle);
                 }
                 setTimeout(rolling, 30, count-1);
             };
