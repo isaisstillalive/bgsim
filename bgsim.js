@@ -858,7 +858,7 @@
         this.max = options.max || 20;
         this.min = options.min || 0;
         this.step = options.step || -1;
-        this.current = options.current || (this.step > 0 ? this.min : this.max);
+        this.value = options.value || (this.step > 0 ? this.min : this.max);
         this.source = options.source;
     }
     {
@@ -867,7 +867,7 @@
         Counter.prototype._draw = function (context)
         {
             if (this.source && this.source instanceof bgsim.Image) {
-                this.source.draw(context, this.current, this.rectangle.size);
+                this.source.draw(context, this.value, this.rectangle.size);
             } else {
                 context.save();
                 context.fillStyle = '#fff';
@@ -877,10 +877,10 @@
                 context.font = '80px monospace';
                 context.textAlign = 'center';
                 context.fillStyle = '#000';
-                if (this.source instanceof Array && this.source[this.current] !== undefined) {
-                    context.fillText(this.source[this.current], 0, 30, this.rectangle.width);
+                if (this.source instanceof Array && this.source[this.value] !== undefined) {
+                    context.fillText(this.source[this.value], 0, 30, this.rectangle.width);
                 } else {
-                    context.fillText(this.current, 0, 30, this.rectangle.width);
+                    context.fillText(this.value, 0, 30, this.rectangle.width);
                 }
                 context.restore();
             }
@@ -899,13 +899,13 @@
 
         Counter.prototype.next = function ()
         {
-            this.current = this.min + (this.current - this.min + this.step + this.range) % this.range;
+            this.value = this.min + (this.value - this.min + this.step + this.range) % this.range;
             this.dispatchEvent('changed');
         };
 
         Counter.prototype.prev = function ()
         {
-            this.current = this.min + (this.current - this.min - this.step + this.range) % this.range;
+            this.value = this.min + (this.value - this.min - this.step + this.range) % this.range;
             this.dispatchEvent('changed');
         };
 
