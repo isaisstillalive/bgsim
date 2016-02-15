@@ -675,7 +675,7 @@
             options = {}
         }
         if (options.doubletapable == undefined) {
-            options.doubletapable = false;
+            options.doubletapable = true;
         }
         Board.call(this, frontImage, options);
 
@@ -717,6 +717,12 @@
         Card.prototype.tap = function ()
         {
             this.sleep = !this.sleep;
+        };
+
+        Card.prototype.doubletap = function ()
+        {
+            this.private = !this.private;
+            console.log('doubletap', this.private);
         };
 
         Card.prototype.__defineSetter__('sleep', function (sleep) {
