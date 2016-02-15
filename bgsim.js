@@ -167,12 +167,35 @@
         };
     }
 
+    // class Player
+    var Player = bgsim.Player = function (options)
+    {
+        if (options === undefined) {
+            options = {}
+        }
+
+        this.name = options.name || 'player';
+        this.angle = options.angle || 0;
+        this.point = options.point || new Point();
+    }
+    {
+        bgsim.Player.Empty = new bgsim.Player();
+
+        Player.prototype.translate = function(context) {
+            // context.translate(this.x, this.y);
+            context.rotate(this.angle * Math.PI / 180);
+        };
+    }
+
     // class Component
     var Component = function (options)
     {
         if (options === undefined) {
             options = {}
         }
+
+        this._player = options.player;
+        this.parent = null;
 
         if (options.rectangle) {
             this.rectangle = options.rectangle;
@@ -186,10 +209,6 @@
         this.zoom = options.zoom || 1;
         this.angle = options.angle || 0;
 
-        this.player = options.player || null;
-
-        this.parent = null;
-
         this.draggable = !!options.draggable;
         this.doubletapable = !!options.doubletapable;
 
@@ -197,9 +216,22 @@
         this.control = {};
     }
     {
+        Component.prototype.__defineGetter__('player', function () {
+            if (this._player) {
+                return this._player;
+            }
+            if (this.parent) {
+                return this.parent.player;
+            }
+            return bgsim.Player.Empty;
+        });
+
         Component.prototype.draw = function (context)
         {
             context.save();
+            if (this._player) {
+                this._player.translate(context);
+            }
             this.rectangle.point.translate(context);
             context.rotate(this.angle * Math.PI / 180);
             context.scale(this.zoom, this.zoom);
@@ -240,7 +272,11 @@
             var innerX = (point.x - this.rectangle.x) / this.zoom;
             var innerY = (point.y - this.rectangle.y) / this.zoom;
 
-            var angle = (360 + (this.angle % 360)) % 360;
+            var angle = this.angle;
+            if (this._player) {
+                angle += this._player.angle;
+            }
+            angle = (360 + (angle % 360)) % 360;
             if (angle == 0) {
                 return new Point(innerX, innerY);
             } else if (angle == 90) {
@@ -378,7 +414,7 @@
     }
 
     // class ComponentSet extends Component
-    var ComponentSet = function (options)
+    var ComponentSet = bgsim.ComponentSet = function (options)
     {
         Component.call(this, options);
 
@@ -561,20 +597,6 @@
 
             return;
         };
-    }
-
-    // class Player extends ComponentSet
-    var Player = bgsim.Player = function (options)
-    {
-        if (options === undefined) {
-            options = {}
-        }
-        ComponentSet.call(this, options);
-
-        this.name = options.name || 'player';
-    }
-    {
-        inherits(Player, ComponentSet);
     }
 
     // class Label extends Component
