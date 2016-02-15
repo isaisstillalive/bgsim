@@ -177,6 +177,7 @@
         this.name = options.name || 'player';
         this.angle = options.angle || 0;
         this.point = options.point || new Point();
+        this.private = !!options.private;
     }
     {
         bgsim.Player.Empty = new bgsim.Player();
@@ -196,6 +197,7 @@
 
         this._player = options.player;
         this.parent = null;
+        this.private = !!options.private;
 
         if (options.rectangle) {
             this.rectangle = options.rectangle;
@@ -687,7 +689,6 @@
             this.backSprite = undefined;
         }
 
-        this._back = false;
         this.back = !!options.back;
 
         this._sleep = false;
@@ -734,23 +735,19 @@
             return this._sleep;
         });
 
-        Card.prototype.__defineSetter__('back', function (back) {
-            if (this._back == back) {
-                return;
+        Card.prototype._draw = function (context)
+        {
+            if (!this.private) {
+                context.fillStyle = 'rgba(255, 70, 70, 0.5)';
+                context.fillRect(-this.rectangle.half_width-4, -this.rectangle.half_height-4, this.rectangle.width+8, this.rectangle.height+8);
             }
-            this._back = back;
-            if (back) {
-                this.image = this.backImage;
-                this.sprite = this.backSprite;
-            } else {
-                this.image = this.frontImage;
-                this.sprite = this.frontSprite;
-            }
-        });
 
-        Card.prototype.__defineGetter__('back', function() {
-            return this._back;
-        });
+            if (this.back || (this.private && this.player.private)) {
+                this.backImage.draw(context, this.backSprite, this.rectangle.size);
+            } else {
+                this.frontImage.draw(context, this.frontSprite, this.rectangle.size);
+            }
+        };
     }
 
     // class Deck extends ComponentSet
@@ -791,6 +788,7 @@
                 card.rectangle.y = y;
                 y += this.thick;
                 card.back = this.back;
+                card.private = this.private;
             }
         };
 
