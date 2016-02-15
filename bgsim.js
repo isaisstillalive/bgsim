@@ -15,6 +15,15 @@
         childCtor.prototype.constructor = childCtor;
     }
 
+    function getRandom(min, max)
+    {
+        if (max == undefined) {
+            max = min;
+            min = 0;
+        }
+        return min + Math.floor(Math.random() * (max - min + 1));
+    }
+
     if (isTouch) {
         window.addEventListener('load', function () {
             var cons = document.getElementById('console');
@@ -840,7 +849,7 @@
         Deck.prototype.shuffle = function ()
         {
             for (var dst = this.components.length; dst--;) {
-                var src = Math.floor(Math.random() * (dst + 1));
+                var src = getRandom(dst);
                 var card = this.components[dst];
                 this.components[dst] = this.components[src];
                 this.components[src] = card;
@@ -959,7 +968,7 @@
 
         Dice.prototype.next = function ()
         {
-            this.step = Math.floor(Math.random() * this.range);
+            this.step = getRandom(this.min, this.max);
             Counter.prototype.next.call(this);
         };
 
@@ -981,9 +990,9 @@
 
                 self.next();
                 if (self.jiggle > 0) {
-                    self.rectangle.x = x - self.jiggle + Math.floor(Math.random() * (self.jiggle*2+1));
-                    self.rectangle.y = y - self.jiggle + Math.floor(Math.random() * (self.jiggle*2+1));
-                    self.angle = angle - self.jiggle + Math.floor(Math.random() * (self.jiggle*2+1));
+                    self.rectangle.x = x + getRandom(-self.jiggle, self.jiggle);
+                    self.rectangle.y = y + getRandom(-self.jiggle, self.jiggle);
+                    self.angle = angle + getRandom(-self.jiggle, self.jiggle);
                 }
                 setTimeout(rolling, 30, count-1);
             };
