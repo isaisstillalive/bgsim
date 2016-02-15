@@ -214,7 +214,7 @@
         this.draggable = !!options.draggable;
         this.doubletapable = !!options.doubletapable;
 
-        this.listeners = {};
+        this.eventListeners = {};
         this.control = {};
     }
     {
@@ -298,6 +298,39 @@
             return new Point(innerX, innerY);
         };
 
+        Component.prototype.addEventListener = function (type, listener)
+        {
+            this.eventListeners[type] = this.eventListeners[type] || []
+            this.eventListeners[type].push(listener);
+        };
+
+        Component.prototype.removeEventListener = function (type, listener)
+        {
+            var listeners = this.eventListeners[type];
+            if (!listeners) {
+                return;
+            }
+
+            for (var i = listeners.length; i--;) {
+                if (listeners[i] == listener) {
+                    delete listeners[i];
+                }
+            }
+        };
+
+        Component.prototype.dispatchEvent = function (type)
+        {
+            var listeners = this.eventListeners[type];
+            console.log('dispatchEvent', type, listeners);
+            if (!listeners) {
+                return;
+            }
+
+            listeners.forEach(function (listener) {
+                listener.call(this);
+            }, this);
+        };
+
         Component.prototype.sendEvent = function (id, point, e)
         {
             switch (e.type) {
@@ -363,6 +396,7 @@
                 } else {
                     window.clearTimeout(this.control.holding);
                     this.control.holding = null;
+                    this.dispatchEvent('dragstart');
                 }
             }
 
@@ -866,11 +900,13 @@
         Counter.prototype.next = function ()
         {
             this.current = this.min + (this.current - this.min + this.step + this.range) % this.range;
+            this.dispatchEvent('changed');
         };
 
         Counter.prototype.prev = function ()
         {
             this.current = this.min + (this.current - this.min - this.step + this.range) % this.range;
+            this.dispatchEvent('changed');
         };
 
         Counter.prototype.__defineSetter__('max', function(max){
