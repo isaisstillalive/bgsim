@@ -187,6 +187,8 @@
         this.angle = options.angle || 0;
         this.point = options.point || new Point();
         this.private = !!options.private;
+
+        this.color = options.color || 'rgba(255, 70, 70, 0.5)';
     }
     {
         bgsim.Player.Empty = new bgsim.Player();
@@ -792,7 +794,7 @@
         Card.prototype._draw = function (context)
         {
             if (!this.private) {
-                context.fillStyle = 'rgba(255, 70, 70, 0.5)';
+                context.fillStyle = this.player.color;
                 context.fillRect(-this.rectangle.half_width-4, -this.rectangle.half_height-4, this.rectangle.width+8, this.rectangle.height+8);
             }
 
