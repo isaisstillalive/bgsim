@@ -73,24 +73,13 @@
         this.height = height;
     }
     {
-        bgsim.Size.defineAccessor = function(klass)
-        {
-            klass.prototype.__defineGetter__('width', function() {
-                return this.size.width;
-            });
+        bgsim.Size.prototype.__defineGetter__('half_width', function() {
+            return this.width / 2;
+        });
 
-            klass.prototype.__defineSetter__('width', function(width) {
-                return this.size.width = width;
-            });
-
-            klass.prototype.__defineGetter__('height', function() {
-                return this.size.height;
-            });
-
-            klass.prototype.__defineSetter__('height', function(height) {
-                return this.size.height = height;
-            });
-        };
+        bgsim.Size.prototype.__defineGetter__('half_height', function() {
+            return this.height / 2;
+        });
     }
 
     bgsim.Rectangle = function (x, y, width, height)
@@ -99,16 +88,6 @@
         this.size = new bgsim.Size(width, height);
     }
     {
-        bgsim.Point.defineAccessor(bgsim.Rectangle);
-        bgsim.Size.defineAccessor(bgsim.Rectangle);
-
-        bgsim.Rectangle.prototype.__defineGetter__('half_width', function() {
-            return this.width / 2;
-        });
-
-        bgsim.Rectangle.prototype.__defineGetter__('half_height', function() {
-            return this.height / 2;
-        });
     }
 
     bgsim.Image = function (image, options)
@@ -139,8 +118,6 @@
         }
     }
     {
-        bgsim.Size.defineAccessor(bgsim.Image);
-
         bgsim.Image.prototype.loadImage = function (image)
         {
             switch (Object.prototype.toString.call(image)) {
@@ -172,7 +149,7 @@
                 cripX = this.size.width * (sprite % this.sprites[0]);
                 cripY = this.size.height * (Math.floor(sprite / this.sprites[0]) % this.sprites[1]);
             }
-            context.drawImage(this.image, cripX, cripY, this.width, this.height, -size.width/2, -size.height/2, size.width, size.height);
+            context.drawImage(this.image, cripX, cripY, this.size.width, this.size.height, -size.width/2, -size.height/2, size.width, size.height);
         };
     }
 
@@ -263,8 +240,8 @@
 
         bgsim.Component.prototype.within = function (point)
         {
-            return (point.x >= -this.rectangle.half_width && point.x <= this.rectangle.half_width &&
-                    point.y >= -this.rectangle.half_height && point.y <= this.rectangle.half_height);
+            return (point.x >= -this.rectangle.size.half_width && point.x <= this.rectangle.size.half_width &&
+                    point.y >= -this.rectangle.size.half_height && point.y <= this.rectangle.size.half_height);
         };
 
         bgsim.Component.prototype.getAllLocalPoint = function (point, finding)
@@ -282,8 +259,8 @@
 
         bgsim.Component.prototype.getLocalPoint = function (point)
         {
-            var innerX = (point.x - this.rectangle.x) / this.zoom;
-            var innerY = (point.y - this.rectangle.y) / this.zoom;
+            var innerX = (point.x - this.rectangle.point.x) / this.zoom;
+            var innerY = (point.y - this.rectangle.point.y) / this.zoom;
 
             var angle = this.angle;
             if (this._player) {
@@ -378,8 +355,8 @@
 
             if (this.draggable) {
                 this.control.draging = {
-                    x: this.rectangle.x - point.x,
-                    y: this.rectangle.y - point.y,
+                    x: this.rectangle.point.x - point.x,
+                    y: this.rectangle.point.y - point.y,
                 };
                 var i = this.parent.components.indexOf(this);
                 this.parent.components.splice(i, 1);
@@ -401,8 +378,8 @@
 
             if (this.control.isClick) {
                 this.control.isClick = (
-                    Math.abs(this.control.draging.x - (this.rectangle.x - point.x)) <= 15 &&
-                    Math.abs(this.control.draging.y - (this.rectangle.y - point.y)) <= 15
+                    Math.abs(this.control.draging.x - (this.rectangle.point.x - point.x)) <= 15 &&
+                    Math.abs(this.control.draging.y - (this.rectangle.point.y - point.y)) <= 15
                 );
                 if (this.control.isClick) {
                     return;
@@ -413,8 +390,8 @@
                 }
             }
 
-            this.rectangle.x = this.control.draging.x + point.x;
-            this.rectangle.y = this.control.draging.y + point.y;
+            this.rectangle.point.x = this.control.draging.x + point.x;
+            this.rectangle.point.y = this.control.draging.y + point.y;
 
             console.log('dragmove', point, this.rectangle);
             // console.log(this.control.dragBaseX, this.control.dragBaseY);
@@ -485,8 +462,8 @@
             if (this.backgroundColor != null) {
                 context.save();
                 context.fillStyle = this.backgroundColor;
-                context.fillRect(-this.rectangle.half_width, -this.rectangle.half_height, this.rectangle.width, this.rectangle.height);
-                context.strokeRect(0, 0, this.rectangle.half_width, this.rectangle.half_height);
+                context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
+                context.strokeRect(0, 0, this.rectangle.size.half_width, this.rectangle.size.half_height);
                 context.restore();
             }
 
@@ -534,11 +511,11 @@
             canvas.width = window.innerWidth * window.devicePixelRatio;
             canvas.height = window.innerHeight * window.devicePixelRatio;
 
-            this.rectangle.x = canvas.width/2;
-            this.rectangle.y = canvas.height/2;
-            this.rectangle.width = window.innerWidth;
-            this.rectangle.height = window.innerHeight;
             // $('#console').val('game:' + this.rectangle.x + ', ' + this.rectangle.y);
+            this.rectangle.point.x = canvas.width/2;
+            this.rectangle.point.y = canvas.height/2;
+            this.rectangle.size.width = window.innerWidth;
+            this.rectangle.size.height = window.innerHeight;
 
             var events = [];
             if (isTouch) {
@@ -668,13 +645,13 @@
         {
             context.save();
             context.fillStyle = '#fff';
-            context.fillRect(-this.rectangle.half_width, -this.rectangle.half_height, this.rectangle.width, this.rectangle.height);
+            context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
             context.strokeStyle = '#000';
-            context.strokeRect(-this.rectangle.half_width, -this.rectangle.half_height, this.rectangle.width, this.rectangle.height);
+            context.strokeRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
             context.font = '80px monospace';
             context.textAlign = 'center';
             context.fillStyle = '#000';
-            context.fillText(this.text, 0, 30, this.rectangle.width);
+            context.fillText(this.text, 0, 30, this.rectangle.size.width);
             context.restore();
         };
     }
@@ -794,7 +771,7 @@
         {
             if (!this.private) {
                 context.fillStyle = this.player.color;
-                context.fillRect(-this.rectangle.half_width-4, -this.rectangle.half_height-4, this.rectangle.width+8, this.rectangle.height+8);
+                context.fillRect(-this.rectangle.size.half_width-4, -this.rectangle.size.half_height-4, this.rectangle.size.width+8, this.rectangle.size.height+8);
             }
 
             if (this.back || (this.private && this.player.private)) {
@@ -839,8 +816,8 @@
             var y = -this.components.length*this.thick;
             for (var i = this.components.length; i--;) {
                 var card = this.components[i];
-                card.rectangle.x = 0;
-                card.rectangle.y = y;
+                card.rectangle.point.x = 0;
+                card.rectangle.point.y = y;
                 y += this.thick;
                 card.back = this.back;
                 card.private = this.private;
@@ -892,16 +869,16 @@
             } else {
                 context.save();
                 context.fillStyle = '#fff';
-                context.fillRect(-this.rectangle.half_width, -this.rectangle.half_height, this.rectangle.width, this.rectangle.height);
+                context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
                 context.strokeStyle = '#000';
-                context.strokeRect(-this.rectangle.half_width, -this.rectangle.half_height, this.rectangle.width, this.rectangle.height);
+                context.strokeRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
                 context.font = '80px monospace';
                 context.textAlign = 'center';
                 context.fillStyle = '#000';
                 if (this.source instanceof Array && this.source[this.value] !== undefined) {
-                    context.fillText(this.source[this.value], 0, 30, this.rectangle.width);
+                    context.fillText(this.source[this.value], 0, 30, this.rectangle.size.width);
                 } else {
-                    context.fillText(this.value, 0, 30, this.rectangle.width);
+                    context.fillText(this.value, 0, 30, this.rectangle.size.width);
                 }
                 context.restore();
             }
@@ -977,22 +954,22 @@
         {
             console.log('dice_tap');
             var self = this;
-            var x = this.rectangle.x;
-            var y = this.rectangle.y;
+            var x = this.rectangle.point.x;
+            var y = this.rectangle.point.y;
             var angle = this.angle;
 
             var rolling = function(count) {
                 if (count < 0) {
-                    self.rectangle.x = x;
-                    self.rectangle.y = y;
+                    self.rectangle.point.x = x;
+                    self.rectangle.point.y = y;
                     self.angle = angle;
                     return;
                 }
 
                 self.next();
                 if (self.jiggle > 0) {
-                    self.rectangle.x = x + getRandom(-self.jiggle, self.jiggle);
-                    self.rectangle.y = y + getRandom(-self.jiggle, self.jiggle);
+                    self.rectangle.point.x = x + getRandom(-self.jiggle, self.jiggle);
+                    self.rectangle.point.y = y + getRandom(-self.jiggle, self.jiggle);
                     self.angle = angle + getRandom(-self.jiggle, self.jiggle);
                 }
                 setTimeout(rolling, 30, count-1);
