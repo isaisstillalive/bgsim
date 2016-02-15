@@ -216,7 +216,7 @@
         this.holdable = !!options.holdable;
         this.doubletapable = !!options.doubletapable;
 
-        this.eventListeners = {};
+        this.eventHandlers = {};
         this.control = {};
     }
     {
@@ -299,36 +299,45 @@
             return new bgsim.Point(innerX, innerY);
         };
 
-        bgsim.Component.prototype.addEventListener = function (type, listener)
+        bgsim.Component.prototype.on = function (event, handler)
         {
-            this.eventListeners[type] = this.eventListeners[type] || []
-            this.eventListeners[type].push(listener);
+            this.eventHandlers[event] = this.eventHandlers[event] || []
+            this.eventHandlers[event].push(handler);
         };
 
-        bgsim.Component.prototype.removeEventListener = function (type, listener)
+        bgsim.Component.prototype.off = function (event, handler)
         {
-            var listeners = this.eventListeners[type];
-            if (!listeners) {
+            var eventHandlers = this.eventHandlers[event];
+            if (!eventHandlers) {
                 return;
             }
 
-            for (var i = listeners.length; i--;) {
-                if (listeners[i] == listener) {
-                    delete listeners[i];
+            for (var i = eventHandlers.length; i--;) {
+                if (eventHandlers[i] == handler) {
+                    delete eventHandlers[i];
                 }
             }
         };
 
-        bgsim.Component.prototype.dispatchEvent = function (type)
+        bgsim.Component.prototype.one = function (event, handler)
         {
-            var listeners = this.eventListeners[type];
-            console.log('dispatchEvent', type, listeners);
-            if (!listeners) {
+            var tempHandler = function () {
+                handler.call(this);
+                this.off(event, tempHandler);
+            };
+            this.on(event, tempHandler);
+        };
+
+        bgsim.Component.prototype.trigger = function (event)
+        {
+            var eventHandlers = this.eventHandlers[event];
+            console.log('trigger', event, eventHandlers);
+            if (!eventHandlers) {
                 return;
             }
 
-            listeners.forEach(function (listener) {
-                listener.call(this);
+            eventHandlers.forEach(function (eventHandler) {
+                eventHandler.call(this);
             }, this);
         };
 
@@ -399,7 +408,7 @@
                 } else {
                     window.clearTimeout(this.control.holding);
                     this.control.holding = null;
-                    this.dispatchEvent('dragstart');
+                    this.trigger('dragstart');
                 }
             }
 
@@ -911,13 +920,13 @@
         bgsim.Counter.prototype.next = function ()
         {
             this.value = this.min + (this.value - this.min + this.step + this.range) % this.range;
-            this.dispatchEvent('changed');
+            this.trigger('changed');
         };
 
         bgsim.Counter.prototype.prev = function ()
         {
             this.value = this.min + (this.value - this.min - this.step + this.range) % this.range;
-            this.dispatchEvent('changed');
+            this.trigger('changed');
         };
 
         bgsim.Counter.prototype.__defineSetter__('max', function(max){
