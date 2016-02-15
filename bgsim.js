@@ -303,22 +303,22 @@
             switch (e.type) {
                 case 'mousedown':
                 case 'touchstart':
-                    return this.dragstart(point);
+                    return this.sendEventDragStart(point);
 
                 case 'mousemove':
                 case 'touchmove':
-                    return this.dragmove(point);
+                    return this.sendEventDragMove(point);
 
                 case 'mouseup':
                 case 'touchend':
-                    return this.dragend(point);
+                    return this.sendEventDragEnd(point);
 
                 case 'touchcancel':
                     return false;
             }
         };
 
-        Component.prototype.dragstart = function (point)
+        Component.prototype.sendEventDragStart = function (point)
         {
             this.control.isClick = true;
 
@@ -347,7 +347,7 @@
             return true;
         };
 
-        Component.prototype.dragmove = function (point)
+        Component.prototype.sendEventDragMove = function (point)
         {
             if (this.control.draging == null) {
                 return;
@@ -376,7 +376,7 @@
             return;
         };
 
-        Component.prototype.dragend = function (point)
+        Component.prototype.sendEventDragEnd = function (point)
         {
             this.control.draging = null;
 
