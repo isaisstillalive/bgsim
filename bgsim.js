@@ -212,6 +212,7 @@
         this.zoom = options.zoom || 1;
         this.angle = options.angle || 0;
 
+        this.tappable = !!options.tappable;
         this.draggable = !!options.draggable;
         this.holdable = !!options.holdable;
         this.doubletapable = !!options.doubletapable;
@@ -403,7 +404,7 @@
             }
 
             if (this.control.isClick) {
-                this.control.isClick = (
+                this.control.isClick = this.tappable && (
                     Math.abs(this.control.draging.x - (this.rectangle.point.x - point.x)) <= 15 &&
                     Math.abs(this.control.draging.y - (this.rectangle.point.y - point.y)) <= 15
                 );
