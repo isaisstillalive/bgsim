@@ -336,9 +336,11 @@
                 return;
             }
 
+            var result = false;
             eventHandlers.forEach(function (eventHandler) {
-                eventHandler.call(this);
+                result = eventHandler.call(this) || result;
             }, this);
+            return result;
         };
 
         bgsim.Component.prototype.sendEvent = function (id, point, e)
@@ -371,7 +373,9 @@
                     self.control.holding = null;
                     self.control.draging = null;
                     self.control.isClick = null;
-                    self.hold();
+                    if (!self.trigger('hold')) {
+                        self.hold();
+                    }
                 }, 500);
             }
 
@@ -434,15 +438,21 @@
                         var self = this;
                         this.control.clicking = window.setTimeout(function(){
                             self.control.clicking = null;
-                            self.tap();
+                            if (!self.trigger('tap')) {
+                                self.tap();
+                            }
                         }, 300);
                     } else {
                         window.clearTimeout(this.control.clicking);
                         this.control.clicking = null;
-                        this.doubletap();
+                        if (!this.trigger('doubletap')) {
+                            this.doubletap();
+                        }
                     }
                 } else {
-                    this.tap();
+                    if (!this.trigger('tap')) {
+                        this.tap();
+                    }
                 }
             }
             return false;
