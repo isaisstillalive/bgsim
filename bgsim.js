@@ -76,12 +76,22 @@
         this.height = height;
     }
     {
-        bgsim.Size.prototype.__defineGetter__('half_width', function() {
-            return this.width / 2;
+        bgsim.Size.prototype.__defineGetter__('width', function() {
+            return this._width;
         });
 
-        bgsim.Size.prototype.__defineGetter__('half_height', function() {
-            return this.height / 2;
+        bgsim.Size.prototype.__defineSetter__('width', function(width) {
+            this.half_width = width / 2;
+            return this._width = width;
+        });
+
+        bgsim.Size.prototype.__defineGetter__('height', function() {
+            return this._height;
+        });
+
+        bgsim.Size.prototype.__defineSetter__('height', function(height) {
+            this.half_height = height / 2;
+            return this._height = height;
         });
     }
 
