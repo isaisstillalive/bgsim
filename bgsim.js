@@ -579,148 +579,6 @@
         };
     }
 
-    // class Game extends Component
-    var Game = function ()
-    {
-        var options = {
-            zoom: 1,
-        }
-        bgsim.Component.call(this, options);
-    }
-    {
-        util.inherits(Game, bgsim.Component);
-
-        Game.prototype.start = function (canvas, init)
-        {
-            this.canvas = canvas;
-            this.context = this.canvas.getContext('2d');
-            this.zoom = window.devicePixelRatio/2;
-            this.listeningComponent = {};
-            this.init = init;
-
-            canvas.style.width = window.innerWidth + 'px';
-            canvas.style.height = window.innerHeight + 'px';
-            canvas.width = window.innerWidth * window.devicePixelRatio;
-            canvas.height = window.innerHeight * window.devicePixelRatio;
-
-            this.rectangle.point.x = canvas.width/2;
-            this.rectangle.point.y = canvas.height/2;
-
-            var events = [];
-            if (util.isTouch) {
-                events.push(['touchstart', this.touchEventSender]);
-                events.push(['touchmove', this.touchEventSender]);
-                events.push(['touchend', this.touchEventSender]);
-                events.push(['touchcancel', this.touchEventSender]);
-            } else {
-                events.push(['mousedown', this.mouseEventSender]);
-                events.push(['mousemove', this.mouseEventSender]);
-                events.push(['mouseup', this.mouseEventSender]);
-            }
-            var self = this;
-            events.forEach(function(data) {
-                self.canvas.addEventListener(data[0], function(e){ return data[1].call(self, e); }, false);
-            });
-
-            this.init();
-            this.draw();
-        };
-
-
-        Game.prototype.reset = function ()
-        {
-            for (var i = this.children.length; i--;) {
-                this.children[i];
-            }
-            this.children = [];
-            this.init();
-        }
-
-        Game.prototype.draw = function ()
-        {
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            bgsim.Component.prototype.draw.call(this, this.context);
-            var self = this;
-            window.requestAnimationFrame(function(){ self.draw(); });
-        };
-
-        Game.prototype.within = function (point)
-        {
-            return true;
-        };
-
-        Game.prototype.touchEventSender = function (e)
-        {
-            for (var i = e.changedTouches.length; i--;) {
-                var touch = e.changedTouches[i];
-
-                var x = touch.pageX * window.devicePixelRatio;
-                var y = touch.pageY * window.devicePixelRatio;
-
-                var e2 = {
-                    type: e.type,
-                    offsetX: x,
-                    offsetY: y,
-                    changedTouches: [touch],
-                };
-
-                var point = new bgsim.Point(x, y);
-                this.sendEvent(touch.identifier, point, e2);
-                // $('#console').val('touch:' + e.type);
-            }
-        };
-
-        Game.prototype.mouseEventSender = function (e)
-        {
-            var point = new bgsim.Point(e.offsetX, e.offsetY);
-            this.sendEvent(0, point, e);
-            // $('#console').val('mouse:' + e.type);
-        };
-
-        Game.prototype.sendEvent = function (id, point, e)
-        {
-            var component = null;
-
-            if (this.listeningComponent[id] == undefined) {
-                component = this.getComponentFromPoint(point);
-                if (component != null) {
-                    point = component.point;
-                    component = component.component;
-                    if (component == this) {
-                        return;
-                    }
-                    for (var i in this.listeningComponent) {
-                        if (this.listeningComponent[i] === component) {
-                            return;
-                        }
-                    };
-                }
-            } else {
-                console.log('usecache:'+id);
-                // $('#console').val('usecache:' + id);
-
-                component = this.listeningComponent[id];
-                point = component.parent.getAllLocalPoint(point);
-            }
-
-            if (component != null) {
-                var result = component.sendEvent(id, point, e);
-                if (result === true) {
-                    console.log('cache:'+id);
-                    // $('#console').val('cache:' + id);
-                    this.listeningComponent[id] = component;
-                } else if (result === false) {
-                    console.log('discache:'+id);
-                    // $('#console').val('discache:' + id);
-                    delete this.listeningComponent[id];
-                }
-                return result;
-            }
-
-            return;
-        };
-    }
-
     // class Board extends Component
     bgsim.Board = function (image, options)
     {
@@ -1061,5 +919,146 @@
         };
     }
 
+    // class Game extends Component
+    var Game = function ()
+    {
+        var options = {
+            zoom: 1,
+        }
+        bgsim.Component.call(this, options);
+    }
+    {
+        util.inherits(Game, bgsim.Component);
+
+        Game.prototype.start = function (canvas, init)
+        {
+            this.canvas = canvas;
+            this.context = this.canvas.getContext('2d');
+            this.zoom = window.devicePixelRatio/2;
+            this.listeningComponent = {};
+            this.init = init;
+
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+            canvas.width = window.innerWidth * window.devicePixelRatio;
+            canvas.height = window.innerHeight * window.devicePixelRatio;
+
+            this.rectangle.point.x = canvas.width/2;
+            this.rectangle.point.y = canvas.height/2;
+
+            var events = [];
+            if (util.isTouch) {
+                events.push(['touchstart', this.touchEventSender]);
+                events.push(['touchmove', this.touchEventSender]);
+                events.push(['touchend', this.touchEventSender]);
+                events.push(['touchcancel', this.touchEventSender]);
+            } else {
+                events.push(['mousedown', this.mouseEventSender]);
+                events.push(['mousemove', this.mouseEventSender]);
+                events.push(['mouseup', this.mouseEventSender]);
+            }
+            var self = this;
+            events.forEach(function(data) {
+                self.canvas.addEventListener(data[0], function(e){ return data[1].call(self, e); }, false);
+            });
+
+            this.init();
+            this.draw();
+        };
+
+        Game.prototype.reset = function ()
+        {
+            for (var i = this.children.length; i--;) {
+                this.children[i];
+            }
+            this.children = [];
+            this.init();
+        }
+
+        Game.prototype.draw = function ()
+        {
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            bgsim.Component.prototype.draw.call(this, this.context);
+            var self = this;
+            window.requestAnimationFrame(function(){ self.draw(); });
+        };
+
+        Game.prototype.within = function (point)
+        {
+            return true;
+        };
+
+        Game.prototype.touchEventSender = function (e)
+        {
+            for (var i = e.changedTouches.length; i--;) {
+                var touch = e.changedTouches[i];
+
+                var x = touch.pageX * window.devicePixelRatio;
+                var y = touch.pageY * window.devicePixelRatio;
+
+                var e2 = {
+                    type: e.type,
+                    offsetX: x,
+                    offsetY: y,
+                    changedTouches: [touch],
+                };
+
+                var point = new bgsim.Point(x, y);
+                this.sendEvent(touch.identifier, point, e2);
+                // $('#console').val('touch:' + e.type);
+            }
+        };
+
+        Game.prototype.mouseEventSender = function (e)
+        {
+            var point = new bgsim.Point(e.offsetX, e.offsetY);
+            // console.log(point.toString());
+            this.sendEvent(0, point, e);
+            // $('#console').val('mouse:' + e.type);
+        };
+
+        Game.prototype.sendEvent = function (id, point, e)
+        {
+            var component = null;
+
+            if (this.listeningComponent[id] == undefined) {
+                component = this.getComponentFromPoint(point);
+                if (component != null) {
+                    point = component.point;
+                    component = component.component;
+                    if (component == this) {
+                        return;
+                    }
+                    for (var i in this.listeningComponent) {
+                        if (this.listeningComponent[i] === component) {
+                            return;
+                        }
+                    };
+                }
+            } else {
+                // console.log('usecache:'+id);
+                // $('#console').val('usecache:' + id);
+
+                component = this.listeningComponent[id];
+                point = component.parent.getAllLocalPoint(point);
+            }
+
+            if (component != null) {
+                var result = component.sendEvent(id, point, e);
+                if (result === true) {
+                    // console.log('cache:'+id);
+                    // $('#console').val('cache:' + id);
+                    this.listeningComponent[id] = component;
+                } else if (result === false) {
+                    // console.log('discache:'+id);
+                    // $('#console').val('discache:' + id);
+                    delete this.listeningComponent[id];
+                }
+                return result;
+            }
+
+            return;
+        };
+    }
     bgsim.Game = new Game();
 })(window);
