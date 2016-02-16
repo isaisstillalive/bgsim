@@ -257,13 +257,12 @@
             }
 
             if (this._parent) {
-                var index = this._parent.children.indexOf(this);
-                this._parent.children.splice(index, 1);
+                this._parent.remove(this);
 
                 gp = this._parent.getAllGlobalPoint(gp);
             }
             if (parent) {
-                parent.children.push(this);
+                parent.add(this);
 
                 if (this._parent) {
                     gp = parent.getAllLocalPoint(gp);
@@ -273,6 +272,20 @@
             this.rectangle.point = gp;
             return this._parent = parent;
         });
+
+        bgsim.Component.prototype.add = function (component)
+        {
+            this.children.push(component);
+            this.trigger('added', component);
+        };
+
+        bgsim.Component.prototype.remove = function (component)
+        {
+            var index = this.children.indexOf(component);
+            this.children.splice(index, 1);
+
+            this.trigger('removed', component);
+        };
 
         bgsim.Component.prototype.draw = function (context)
         {
