@@ -210,7 +210,6 @@
         }
 
         this._player = options.player;
-        this.parent = options.parent;
         this.private = !!options.private;
 
         if (options.rectangle) {
@@ -310,17 +309,13 @@
                     point.y >= -this.rectangle.size.half_height && point.y <= this.rectangle.size.half_height);
         };
 
-        bgsim.Component.prototype.getAllLocalPoint = function (point, finding)
+        bgsim.Component.prototype.getAllLocalPoint = function (point)
         {
             var localPoint = point;
             if (this.parent != null) {
-                localPoint = this.parent.getAllLocalPoint(point, true);
+                localPoint = this.parent.getAllLocalPoint(localPoint);
             }
-            if (finding) {
-                return this.getLocalPoint(localPoint);
-            } else {
-                return localPoint;
-            }
+            return this.getLocalPoint(localPoint);
         };
 
         bgsim.Component.prototype.getLocalPoint = function (point)
@@ -680,7 +675,7 @@
                 // $('#console').val('usecache:' + id);
 
                 component = this.listeningComponent[id];
-                point = component.getAllLocalPoint(point);
+                point = component.parent.getAllLocalPoint(point);
             }
 
             if (component != null) {
