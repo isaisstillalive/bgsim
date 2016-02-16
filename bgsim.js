@@ -826,7 +826,7 @@
     }
 
     // class Label extends Component
-    bgsim.Label = function (text, options)
+    bgsim.Label = function (value, options)
     {
         if (!options) {
             options = {}
@@ -837,7 +837,7 @@
 
         bgsim.Component.call(this, options);
 
-        this.text = text;
+        this.value = value;
         this.source = options.source;
     }
     {
