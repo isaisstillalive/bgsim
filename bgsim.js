@@ -384,22 +384,22 @@
             switch (e.type) {
                 case 'mousedown':
                 case 'touchstart':
-                    return this.sendEventDragStart(point);
+                    return this.sendEventTouchStart(point);
 
                 case 'mousemove':
                 case 'touchmove':
-                    return this.sendEventDragMove(point);
+                    return this.sendEventTouchMove(point);
 
                 case 'mouseup':
                 case 'touchend':
-                    return this.sendEventDragEnd(point);
+                    return this.sendEventTouchEnd(point);
 
                 case 'touchcancel':
                     return false;
             }
         };
 
-        bgsim.Component.prototype.sendEventDragStart = function (point)
+        bgsim.Component.prototype.sendEventTouchStart = function (point)
         {
             this.control.isClick = true;
 
@@ -432,7 +432,7 @@
             return true;
         };
 
-        bgsim.Component.prototype.sendEventDragMove = function (point)
+        bgsim.Component.prototype.sendEventTouchMove = function (point)
         {
             if (this.control.draging == null) {
                 return;
@@ -462,7 +462,7 @@
             return;
         };
 
-        bgsim.Component.prototype.sendEventDragEnd = function (point)
+        bgsim.Component.prototype.sendEventTouchEnd = function (point)
         {
             this.control.draging = null;
 
