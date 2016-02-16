@@ -231,6 +231,12 @@
         this.holdable = !!options.holdable;
         this.doubletappable = !!options.doubletappable;
 
+        if (options.containable == undefined) {
+            this.containable = true;
+        } else {
+            this.containable = options.containable;
+        }
+
         this.eventHandlers = {};
         this.control = {};
         this.children = [];
@@ -253,6 +259,10 @@
         bgsim.Component.prototype.__defineSetter__('parent', function (parent) {
             var gp = this.rectangle.point;
             if (this._parent == parent) {
+                return parent;
+            }
+
+            if (!parent.containable) {
                 return parent;
             }
 
