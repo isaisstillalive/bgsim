@@ -327,6 +327,7 @@
         {
             var innerX = (point.x - this.rectangle.point.x) / this.zoom;
             var innerY = (point.y - this.rectangle.point.y) / this.zoom;
+            var result;
 
             var angle = this.angle;
             if (this._player) {
@@ -334,22 +335,25 @@
             }
             angle = (360 + (angle % 360)) % 360;
             if (angle == 0) {
-                return new bgsim.Point(innerX, innerY);
+                result = new bgsim.Point(innerX, innerY);
             } else if (angle == 90) {
-                return new bgsim.Point(innerY, -innerX);
+                result = new bgsim.Point(innerY, -innerX);
             } else if (angle == 180) {
-                return new bgsim.Point(-innerX, -innerY);
+                result = new bgsim.Point(-innerX, -innerY);
             } else if (angle == 270) {
-                return new bgsim.Point(-innerY, innerX);
+                result = new bgsim.Point(-innerY, innerX);
+            } else {
+                var r = Math.atan2(innerY, innerX);
+                var l = innerX / Math.cos(r);
+                var r2 = r - this.angle * Math.PI / 180;
+                innerX = l * Math.cos(r2);
+                innerY = l * Math.sin(r2);
+
+                result = new bgsim.Point(innerX, innerY);
             }
 
-            var r = Math.atan2(innerY, innerX);
-            var l = innerX / Math.cos(r);
-            var r2 = r - this.angle * Math.PI / 180;
-            innerX = l * Math.cos(r2);
-            innerY = l * Math.sin(r2);
-
-            return new bgsim.Point(innerX, innerY);
+            console.log('lp', result.toString(), this);
+            return result;
         };
 
         bgsim.Component.prototype.getAllGlobalPoint = function (point)
