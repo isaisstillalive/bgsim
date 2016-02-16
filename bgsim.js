@@ -219,7 +219,7 @@
 
         this.eventHandlers = {};
         this.control = {};
-        this.components = [];
+        this.children = [];
     }
     {
         bgsim.Component.prototype.__defineGetter__('player', function () {
@@ -243,8 +243,8 @@
             context.scale(this.zoom, this.zoom);
             this._draw(context);
 
-            for (var i = 0; i < this.components.length; i++) {
-                this.components[i].draw(context);
+            for (var i = 0; i < this.children.length; i++) {
+                this.children[i].draw(context);
             }
 
             context.restore();
@@ -258,8 +258,8 @@
         {
             var localPoint = this.getLocalPoint(point);
 
-            for (var i = this.components.length; i--;) {
-                var component = this.components[i].getComponentFromPoint(localPoint);
+            for (var i = this.children.length; i--;) {
+                var component = this.children[i].getComponentFromPoint(localPoint);
                 if (component != null) {
                     return component;
                 }
@@ -405,9 +405,9 @@
                     x: this.rectangle.point.x - point.x,
                     y: this.rectangle.point.y - point.y,
                 };
-                var i = this.parent.components.indexOf(this);
-                this.parent.components.splice(i, 1);
-                this.parent.components.push(this);
+                var i = this.parent.children.indexOf(this);
+                this.parent.children.splice(i, 1);
+                this.parent.children.push(this);
             } else {
                 this.control.draging = null;
             }
@@ -493,7 +493,7 @@
 
         bgsim.Component.prototype.push = function (component)
         {
-            this.components.push(component);
+            this.children.push(component);
             component.parent = this;
         };
     }
@@ -551,10 +551,10 @@
 
         Game.prototype.reset = function ()
         {
-            for (var i = this.components.length; i--;) {
-                this.components[i];
+            for (var i = this.children.length; i--;) {
+                this.children[i];
             }
-            this.components = [];
+            this.children = [];
             this.init();
         }
 
@@ -792,9 +792,9 @@
 
         bgsim.Deck.prototype.reset = function ()
         {
-            var y = -this.components.length*this.thick;
-            for (var i = this.components.length; i--;) {
-                var card = this.components[i];
+            var y = -this.children.length*this.thick;
+            for (var i = this.children.length; i--;) {
+                var card = this.children[i];
                 card.rectangle.point.x = 0;
                 card.rectangle.point.y = y;
                 y += this.thick;
@@ -805,11 +805,11 @@
 
         bgsim.Deck.prototype.shuffle = function ()
         {
-            for (var dst = this.components.length; dst--;) {
+            for (var dst = this.children.length; dst--;) {
                 var src = util.getRandom(dst);
-                var card = this.components[dst];
-                this.components[dst] = this.components[src];
-                this.components[src] = card;
+                var card = this.children[dst];
+                this.children[dst] = this.children[src];
+                this.children[src] = card;
             }
         };
     }
