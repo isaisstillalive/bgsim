@@ -224,6 +224,8 @@
         this.zoom = options.zoom || 1;
         this.angle = options.angle || 0;
 
+        this.parent = options.parent;
+
         this.tappable = !!options.tappable;
         this.draggable = !!options.draggable;
         this.holdable = !!options.holdable;
@@ -249,13 +251,26 @@
         });
 
         bgsim.Component.prototype.__defineSetter__('parent', function (parent) {
+            var gp = this.rectangle.point;
+            if (this._parent == parent) {
+                return parent;
+            }
+
             if (this._parent) {
                 var index = this._parent.children.indexOf(this);
                 this._parent.children.splice(index, 1);
+
+                gp = this._parent.getAllGlobalPoint(gp);
             }
             if (parent) {
                 parent.children.push(this);
+
+                if (this._parent) {
+                    gp = parent.getAllLocalPoint(gp);
+                }
             }
+
+            this.rectangle.point = gp;
             return this._parent = parent;
         });
 
@@ -513,6 +528,13 @@
 
         bgsim.Component.prototype.sendEventTouchEnd = function (point)
         {
+            if (this.control.draging) {
+                var gp = this.getAllGlobalPoint(new bgsim.Point(0, 0));
+                var component = bgsim.Game.getComponentFromPoint(gp);
+                if (component) {
+                    this.parent = component.component;
+                }
+            }
             this.control.draging = null;
             this.floating = false;
 
