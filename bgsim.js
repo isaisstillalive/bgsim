@@ -732,59 +732,6 @@
         };
     }
 
-    // class Deck extends Component
-    bgsim.Deck = function (cards, options)
-    {
-        if (options === undefined) {
-            options = {}
-        }
-        bgsim.Component.call(this, options);
-
-        this.back = !!options.back;
-        this.thick = options.thick || 0;
-
-        var copyFunc = options.copy || function(i, card){};
-
-        var count = 0;
-        for (var i = 0; i < cards.length; i++) {
-            var card = cards[i][0];
-            for (var c = cards[i][1]; c--;) {
-                var copyCard = card.copy();
-                copyFunc.call(copyCard, count++, card);
-                copyCard.parent = this;
-            };
-        }
-
-        this.shuffle();
-        this.reset();
-    }
-    {
-        util.inherits(bgsim.Deck, bgsim.Component);
-
-        bgsim.Deck.prototype.reset = function ()
-        {
-            var y = -this.children.length*this.thick;
-            for (var i = this.children.length; i--;) {
-                var card = this.children[i];
-                card.rectangle.point.x = 0;
-                card.rectangle.point.y = y;
-                y += this.thick;
-                card.back = this.back;
-                card.private = this.private;
-            }
-        };
-
-        bgsim.Deck.prototype.shuffle = function ()
-        {
-            for (var dst = this.children.length; dst--;) {
-                var src = util.getRandom(dst);
-                var card = this.children[dst];
-                this.children[dst] = this.children[src];
-                this.children[src] = card;
-            }
-        };
-    }
-
     // class Label extends Component
     bgsim.Label = function (value, options)
     {
@@ -964,6 +911,57 @@
             context.fillStyle = this.color;
             context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
             context.restore();
+
+    // class Deck extends Area
+    bgsim.Deck = function (cards, options)
+    {
+        if (options === undefined) {
+            options = {}
+        }
+        bgsim.Area.call(this, options);
+
+        this.back = !!options.back;
+        this.thick = options.thick || 0;
+
+        var copyFunc = options.copy || function(i, card){};
+
+        var count = 0;
+        for (var i = 0; i < cards.length; i++) {
+            var card = cards[i][0];
+            for (var c = cards[i][1]; c--;) {
+                var copyCard = card.copy();
+                copyFunc.call(copyCard, count++, card);
+                copyCard.parent = this;
+            };
+        }
+
+        this.shuffle();
+        this.reset();
+    }
+    {
+        util.inherits(bgsim.Deck, bgsim.Area);
+
+        bgsim.Deck.prototype.reset = function ()
+        {
+            var y = -this.children.length*this.thick;
+            for (var i = this.children.length; i--;) {
+                var card = this.children[i];
+                card.rectangle.point.x = 0;
+                card.rectangle.point.y = y;
+                y += this.thick;
+                card.back = this.back;
+                card.private = this.private;
+            }
+        };
+
+        bgsim.Deck.prototype.shuffle = function ()
+        {
+            for (var dst = this.children.length; dst--;) {
+                var src = util.getRandom(dst);
+                var card = this.children[dst];
+                this.children[dst] = this.children[src];
+                this.children[src] = card;
+            }
         };
     }
 
