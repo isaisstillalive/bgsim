@@ -251,7 +251,7 @@
 
         bgsim.Component.prototype.__defineSetter__('parent', function (parent) {
             if (this._parent) {
-                var index = this._parent.children.indexOf(parent);
+                var index = this._parent.children.indexOf(this);
                 this._parent.children.splice(index, 1);
             }
             if (parent) {
