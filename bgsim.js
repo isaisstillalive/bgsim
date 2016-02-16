@@ -919,6 +919,27 @@
         };
     }
 
+    bgsim.Area = function (options)
+    {
+        if (options === undefined) {
+            options = {}
+        }
+        bgsim.Component.call(this, options);
+
+        this.color = options.color;
+    }
+    {
+        util.inherits(bgsim.Area, bgsim.Component);
+
+        bgsim.Area.prototype._draw = function (context)
+        {
+            context.save();
+            context.fillStyle = this.color;
+            context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
+            context.restore();
+        };
+    }
+
     // class Game extends Component
     var Game = function ()
     {
