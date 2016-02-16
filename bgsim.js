@@ -219,6 +219,7 @@
 
         this.eventHandlers = {};
         this.control = {};
+        this.components = [];
     }
     {
         bgsim.Component.prototype.__defineGetter__('player', function () {
@@ -241,15 +242,34 @@
             context.rotate(this.angle * Math.PI / 180);
             context.scale(this.zoom, this.zoom);
             this._draw(context);
+
+            for (var i = 0; i < this.components.length; i++) {
+                this.components[i].draw(context);
+            }
+
             context.restore();
+        };
+
+        bgsim.Component.prototype._draw = function (context)
+        {
         };
 
         bgsim.Component.prototype.getComponentFromPoint = function (point)
         {
             var localPoint = this.getLocalPoint(point);
+
+            for (var i = this.components.length; i--;) {
+                var component = this.components[i].getComponentFromPoint(localPoint);
+                if (component != null) {
+                    return component;
+                }
+            }
+
             if (this.within(localPoint)) {
                 return {component: this, point: point};
             }
+
+            return;
         }
 
         bgsim.Component.prototype.within = function (point)
@@ -470,66 +490,24 @@
         bgsim.Component.prototype.doubletap = function ()
         {
         };
-    }
 
-    // class ComponentSet extends Component
-    bgsim.ComponentSet = function (options)
-    {
-        bgsim.Component.call(this, options);
-
-        this.backgroundColor = options.backgroundColor || null;
-
-        this.components = [];
-    }
-    {
-        util.inherits(bgsim.ComponentSet, bgsim.Component);
-
-        bgsim.ComponentSet.prototype.push = function (component)
+        bgsim.Component.prototype.push = function (component)
         {
             this.components.push(component);
             component.parent = this;
         };
-
-        bgsim.ComponentSet.prototype._draw = function (context)
-        {
-            if (this.backgroundColor != null) {
-                context.save();
-                context.fillStyle = this.backgroundColor;
-                context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
-                context.strokeRect(0, 0, this.rectangle.size.half_width, this.rectangle.size.half_height);
-                context.restore();
-            }
-
-            for (var i = 0; i < this.components.length; i++) {
-                this.components[i].draw(context);
-            }
-        };
-
-        bgsim.ComponentSet.prototype.getComponentFromPoint = function (point)
-        {
-            var localPoint = this.getLocalPoint(point);
-
-            for (var i = this.components.length; i--;) {
-                var component = this.components[i].getComponentFromPoint(localPoint);
-                if (component != null) {
-                    return component;
-                }
-            }
-
-            return;
-        }
     }
 
-    // class Game extends ComponentSet
+    // class Game extends Component
     var Game = function ()
     {
         var options = {
             zoom: 1,
         }
-        bgsim.ComponentSet.call(this, options);
+        bgsim.Component.call(this, options);
     }
     {
-        util.inherits(Game, bgsim.ComponentSet);
+        util.inherits(Game, bgsim.Component);
 
         Game.prototype.start = function (canvas, init)
         {
@@ -583,7 +561,7 @@
         Game.prototype.draw = function ()
         {
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            bgsim.ComponentSet.prototype.draw.call(this, this.context);
+            bgsim.Component.prototype.draw.call(this, this.context);
             var self = this;
             window.requestAnimationFrame(function(){ self.draw(); });
         };
@@ -783,13 +761,13 @@
         };
     }
 
-    // class Deck extends ComponentSet
+    // class Deck extends Component
     bgsim.Deck = function (cards, options)
     {
         if (options === undefined) {
             options = {}
         }
-        bgsim.ComponentSet.call(this, options);
+        bgsim.Component.call(this, options);
 
         this.back = !!options.back;
         this.thick = options.thick || 0;
@@ -810,7 +788,7 @@
         this.reset();
     }
     {
-        util.inherits(bgsim.Deck, bgsim.ComponentSet);
+        util.inherits(bgsim.Deck, bgsim.Component);
 
         bgsim.Deck.prototype.reset = function ()
         {
