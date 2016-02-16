@@ -274,7 +274,11 @@
             var localPoint = this.getLocalPoint(point);
 
             for (var i = this.children.length; i--;) {
-                var component = this.children[i].getComponentFromPoint(localPoint);
+                var child = this.children[i];
+                if (child.floating) {
+                    continue;
+                }
+                var component = child.getComponentFromPoint(localPoint);
                 if (component != null) {
                     return component;
                 }
@@ -449,6 +453,7 @@
                     window.clearTimeout(this.control.holding);
                     this.control.holding = null;
                     this.trigger('dragstart');
+                    this.floating = true;
                 }
             }
 
@@ -465,6 +470,7 @@
         bgsim.Component.prototype.sendEventTouchEnd = function (point)
         {
             this.control.draging = null;
+            this.floating = false;
 
             if (this.control.isClick) {
                 window.clearTimeout(this.control.holding);
