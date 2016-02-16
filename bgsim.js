@@ -68,6 +68,11 @@
         bgsim.Point.prototype.translate = function(context) {
             context.translate(this.x, this.y);
         };
+
+        bgsim.Point.prototype.toString = function() {
+            return '[' + this.x + ',' + this.y + ']';
+        };
+
     }
 
     bgsim.Size = function (width, height)
@@ -93,6 +98,10 @@
             this.half_height = height / 2;
             return this._height = height;
         });
+
+        bgsim.Size.prototype.toString = function() {
+            return '[' + this.width + ',' + this.height + ']';
+        };
     }
 
     bgsim.Rectangle = function (x, y, width, height)
@@ -101,6 +110,10 @@
         this.size = new bgsim.Size(width, height);
     }
     {
+
+        bgsim.Rectangle.prototype.toString = function() {
+            return '[' + this.point + ',' + this.size + ']';
+        };
     }
 
     bgsim.Image = function (image, options)
@@ -337,6 +350,38 @@
             innerY = l * Math.sin(r2);
 
             return new bgsim.Point(innerX, innerY);
+        };
+
+        bgsim.Component.prototype.getAllGlobalPoint = function (point)
+        {
+            var globalPoint = this.getGlobalPoint(point);
+
+            if (this.parent != null) {
+                globalPoint = this.parent.getAllGlobalPoint(globalPoint);
+            }
+
+            return globalPoint;
+        };
+
+        bgsim.Component.prototype.getGlobalPoint = function (point)
+        {
+            var x, y;
+
+            var angle = this.angle;
+            if (this._player) {
+                angle += this._player.angle;
+            }
+            var r = angle * Math.PI / 180;
+            x = point.x * Math.cos(r) - point.y * Math.sin(r);
+            y = point.x * Math.sin(r) + point.y * Math.cos(r);
+
+            x *= this.zoom;
+            y *= this.zoom;
+
+            x += this.rectangle.point.x;
+            y += this.rectangle.point.y;
+
+            return new bgsim.Point(x, y);
         };
 
         bgsim.Component.prototype.on = function (event, handler)
