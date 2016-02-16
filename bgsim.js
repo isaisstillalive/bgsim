@@ -319,7 +319,7 @@
         {
         };
 
-        bgsim.Component.prototype.getComponentFromPoint = function (point)
+        bgsim.Component.prototype.getComponentFromPoint = function (point, callback)
         {
             var localPoint = this.getLocalPoint(point);
 
@@ -328,13 +328,13 @@
                 if (child.floating) {
                     continue;
                 }
-                var component = child.getComponentFromPoint(localPoint);
+                var component = child.getComponentFromPoint(localPoint, callback);
                 if (component != null) {
                     return component;
                 }
             }
 
-            if (this.within(localPoint)) {
+            if (this.within(localPoint) && (!callback || callback.call(this, this))) {
                 return {component: this, point: point};
             }
 
@@ -555,7 +555,9 @@
         {
             if (this.control.draging) {
                 var gp = this.getAllGlobalPoint(new bgsim.Point(0, 0));
-                var component = bgsim.Game.getComponentFromPoint(gp);
+                var component = bgsim.Game.getComponentFromPoint(gp, function (component) {
+                    return component.containable;
+                });
                 if (component) {
                     this.parent = component.component;
                 }
