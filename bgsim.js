@@ -586,10 +586,10 @@
             canvas.width = window.innerWidth * window.devicePixelRatio;
             canvas.height = window.innerHeight * window.devicePixelRatio;
 
+            this.rectangle.size.width = canvas.width;
+            this.rectangle.size.height = canvas.height;
             this.rectangle.point.x = canvas.width/2;
             this.rectangle.point.y = canvas.height/2;
-            this.rectangle.size.width = window.innerWidth;
-            this.rectangle.size.height = window.innerHeight;
 
             var events = [];
             if (util.isTouch) {
