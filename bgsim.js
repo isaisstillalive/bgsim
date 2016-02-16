@@ -531,7 +531,6 @@
             canvas.width = window.innerWidth * window.devicePixelRatio;
             canvas.height = window.innerHeight * window.devicePixelRatio;
 
-            // $('#console').val('game:' + this.rectangle.x + ', ' + this.rectangle.y);
             this.rectangle.point.x = canvas.width/2;
             this.rectangle.point.y = canvas.height/2;
             this.rectangle.size.width = window.innerWidth;
@@ -592,7 +591,7 @@
 
                 var point = new bgsim.Point(x, y);
                 this.sendEvent(touch.identifier, point, e2);
-                $('#console').val('touch:' + e.type);
+                // $('#console').val('touch:' + e.type);
             }
         };
 
@@ -600,7 +599,7 @@
         {
             var point = new bgsim.Point(e.offsetX, e.offsetY);
             this.sendEvent(0, point, e);
-            $('#console').val('mouse:' + e.type);
+            // $('#console').val('mouse:' + e.type);
         };
 
         Game.prototype.sendEvent = function (id, point, e)
@@ -620,7 +619,7 @@
                 }
             } else {
                 console.log('usecache:'+id);
-                $('#console').val('usecache:' + id);
+                // $('#console').val('usecache:' + id);
 
                 component = this.listeningComponent[id];
                 point = component.getAllLocalPoint(point);
@@ -630,11 +629,11 @@
                 var result = component.sendEvent(id, point, e);
                 if (result === true) {
                     console.log('cache:'+id);
-                    $('#console').val('cache:' + id);
+                    // $('#console').val('cache:' + id);
                     this.listeningComponent[id] = component;
                 } else if (result === false) {
                     console.log('discache:'+id);
-                    $('#console').val('discache:' + id);
+                    // $('#console').val('discache:' + id);
                     delete this.listeningComponent[id];
                 }
                 return result;
