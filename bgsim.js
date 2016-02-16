@@ -657,38 +657,6 @@
         };
     }
 
-    // class Label extends Component
-    bgsim.Label = function (text, options)
-    {
-        if (!options) {
-            options = {}
-        }
-        if (options.doubletapable == undefined) {
-            options.doubletapable = false;
-        }
-
-        bgsim.Component.call(this, options);
-        this.text = text;
-        // this.sprite = options.sprite;
-    }
-    {
-        util.inherits(bgsim.Label, bgsim.Component);
-
-        bgsim.Label.prototype._draw = function (context)
-        {
-            context.save();
-            context.fillStyle = '#fff';
-            context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
-            context.strokeStyle = '#000';
-            context.strokeRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
-            context.font = '80px monospace';
-            context.textAlign = 'center';
-            context.fillStyle = '#000';
-            context.fillText(this.text, 0, 30, this.rectangle.size.width);
-            context.restore();
-        };
-    }
-
     // class Board extends Component
     bgsim.Board = function (image, options)
     {
@@ -868,34 +836,25 @@
         };
     }
 
-    // class Counter extends Component
-    bgsim.Counter = function (options)
+    // class Label extends Component
+    bgsim.Label = function (text, options)
     {
-        if (options === undefined) {
+        if (!options) {
             options = {}
         }
-        options.width = options.width || 50;
-        options.height = options.height || 50;
-
-        options.doubletapable = false;
-        if (options.holdable == undefined) {
-            options.holdable = true;
+        if (options.doubletapable == undefined) {
+            options.doubletapable = false;
         }
 
         bgsim.Component.call(this, options);
 
-        this._min = 0;
-        this.range = 0;
-        this.max = options.max || 20;
-        this.min = options.min || 0;
-        this.step = options.step || -1;
-        this.value = options.value || (this.step > 0 ? this.min : this.max);
+        this.text = text;
         this.source = options.source;
     }
     {
-        util.inherits(bgsim.Counter, bgsim.Component);
+        util.inherits(bgsim.Label, bgsim.Component);
 
-        bgsim.Counter.prototype._draw = function (context)
+        bgsim.Label.prototype._draw = function (context)
         {
             if (this.source && this.source instanceof bgsim.Image) {
                 this.source.draw(context, this.value, this.rectangle.size);
@@ -916,6 +875,33 @@
                 context.restore();
             }
         };
+    }
+
+    // class Counter extends Label
+    bgsim.Counter = function (options)
+    {
+        if (options === undefined) {
+            options = {}
+        }
+        options.width = options.width || 50;
+        options.height = options.height || 50;
+
+        options.doubletapable = false;
+        if (options.holdable == undefined) {
+            options.holdable = true;
+        }
+
+        bgsim.Label.call(this, null, options);
+
+        this._min = 0;
+        this.range = 0;
+        this.max = options.max || 20;
+        this.min = options.min || 0;
+        this.step = options.step || -1;
+        this.value = options.value || (this.step > 0 ? this.min : this.max);
+    }
+    {
+        util.inherits(bgsim.Counter, bgsim.Label);
 
         bgsim.Counter.prototype.tap = function ()
         {
