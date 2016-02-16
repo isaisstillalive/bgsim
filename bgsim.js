@@ -872,7 +872,7 @@
         options.width = options.width || 50;
         options.height = options.height || 50;
 
-        options.doubletapable = false;
+        options.doubletappable = false;
         if (options.holdable == undefined) {
             options.holdable = true;
         }
