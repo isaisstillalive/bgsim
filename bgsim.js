@@ -215,7 +215,7 @@
         this.tappable = !!options.tappable;
         this.draggable = !!options.draggable;
         this.holdable = !!options.holdable;
-        this.doubletapable = !!options.doubletapable;
+        this.doubletappable = !!options.doubletappable;
 
         this.eventHandlers = {};
         this.control = {};
@@ -650,8 +650,8 @@
         if (!options) {
             options = {}
         }
-        if (options.doubletapable == undefined) {
-            options.doubletapable = false;
+        if (options.doubletappable == undefined) {
+            options.doubletappable = false;
         }
 
         bgsim.Component.call(this, options);
@@ -685,8 +685,8 @@
         if (!options) {
             options = {}
         }
-        if (options.doubletapable == undefined) {
-            options.doubletapable = true;
+        if (options.doubletappable == undefined) {
+            options.doubletappable = true;
         }
         if (options.holdable == undefined) {
             options.holdable = true;
@@ -829,8 +829,8 @@
         if (!options) {
             options = {}
         }
-        if (options.doubletapable == undefined) {
-            options.doubletapable = false;
+        if (options.doubletappable == undefined) {
+            options.doubletappable = false;
         }
 
         bgsim.Component.call(this, options);
