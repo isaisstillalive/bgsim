@@ -429,6 +429,8 @@
 
         bgsim.Component.prototype.trigger = function (event)
         {
+            var args = Array.prototype.slice.call(arguments, 1);
+
             var eventHandlers = this.eventHandlers[event];
             console.log('trigger', event, eventHandlers);
             if (!eventHandlers) {
@@ -437,7 +439,7 @@
 
             var result = false;
             eventHandlers.forEach(function (eventHandler) {
-                result = eventHandler.call(this) || result;
+                result = eventHandler.apply(this, args) || result;
             }, this);
             return result;
         };
