@@ -451,6 +451,7 @@
         bgsim.Component.prototype.sendEventTouchStart = function (point)
         {
             this.control.isClick = true;
+            this.floating = true;
 
             var self = this;
             if (this.holdable) {
@@ -498,7 +499,6 @@
                     window.clearTimeout(this.control.holding);
                     this.control.holding = null;
                     this.trigger('dragstart');
-                    this.floating = true;
                 }
             }
 
