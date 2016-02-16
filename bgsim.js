@@ -197,7 +197,7 @@
         }
 
         this._player = options.player;
-        this.parent = null;
+        this.parent = options.parent;
         this.private = !!options.private;
 
         if (options.rectangle) {
@@ -230,6 +230,21 @@
                 return this.parent.player;
             }
             return bgsim.Player.Empty;
+        });
+
+        bgsim.Component.prototype.__defineGetter__('parent', function () {
+            return this._parent;
+        });
+
+        bgsim.Component.prototype.__defineSetter__('parent', function (parent) {
+            if (this._parent) {
+                var index = this._parent.children.indexOf(parent);
+                this._parent.children.splice(index, 1);
+            }
+            if (parent) {
+                parent.children.push(this);
+            }
+            return this._parent = parent;
         });
 
         bgsim.Component.prototype.draw = function (context)
@@ -489,12 +504,6 @@
 
         bgsim.Component.prototype.doubletap = function ()
         {
-        };
-
-        bgsim.Component.prototype.push = function (component)
-        {
-            this.children.push(component);
-            component.parent = this;
         };
     }
 
@@ -780,7 +789,7 @@
             for (var c = cards[i][1]; c--;) {
                 var copyCard = card.copy();
                 copyFunc.call(copyCard, count++, card);
-                this.push(copyCard);
+                copyCard.parent = this;
             };
         }
 
