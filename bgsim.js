@@ -907,10 +907,14 @@
 
         bgsim.Area.prototype._draw = function (context)
         {
-            context.save();
-            context.fillStyle = this.color;
-            context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
-            context.restore();
+            if (this.color) {
+                context.save();
+                context.fillStyle = this.color;
+                context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
+                context.restore();
+            }
+        };
+    }
 
     // class Deck extends Area
     bgsim.Deck = function (cards, options)
