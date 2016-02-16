@@ -611,6 +611,9 @@
                 if (component != null) {
                     point = component.point;
                     component = component.component;
+                    if (component == this) {
+                        return;
+                    }
                     for (var i in this.listeningComponent) {
                         if (this.listeningComponent[i] === component) {
                             return;
