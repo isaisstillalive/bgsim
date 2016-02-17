@@ -223,7 +223,7 @@
         this.parent = options.parent;
 
         this.tappable = !!options.tappable;
-        this.draggable = !!options.draggable;
+        this.movable = !!options.movable;
         this.holdable = !!options.holdable;
         this.doubletappable = !!options.doubletappable;
 
@@ -523,7 +523,7 @@
                 }, 500);
             }
 
-            if (this.draggable) {
+            if (this.movable) {
                 this.control.draging = {
                     x: this.rectangle.point.x - point.x,
                     y: this.rectangle.point.y - point.y,
@@ -705,7 +705,7 @@
             return new bgsim.Card(this.image, this.backImageRaw, {
                 x: this.x,
                 y: this.y,
-                draggable: this.draggable,
+                movable: this.movable,
                 back: this.back,
                 sleep: this.sleep,
                 sprite: this.sprite,
