@@ -941,6 +941,7 @@
         };
     }
 
+    // class Area extends Component
     bgsim.Area = function (options)
     {
         if (options === undefined) {
