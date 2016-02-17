@@ -187,19 +187,12 @@
         }
 
         this.name = options.name || 'player';
-        this.angle = options.angle || 0;
-        this.point = options.point || new bgsim.Point();
         this.private = !!options.private;
 
         this.color = options.color || 'rgba(255, 70, 70, 0.5)';
     }
     {
         bgsim.Player.Empty = new bgsim.Player();
-
-        bgsim.Player.prototype.translate = function(context) {
-            // context.translate(this.x, this.y);
-            context.rotate(this.angle * Math.PI / 180);
-        };
     }
 
     // class Component
@@ -302,9 +295,6 @@
         bgsim.Component.prototype.draw = function (context)
         {
             context.save();
-            if (this._player) {
-                this._player.translate(context);
-            }
             this.rectangle.point.translate(context);
             context.rotate(this.angle * Math.PI / 180);
             context.scale(this.zoom, this.zoom);
@@ -369,9 +359,6 @@
             var result;
 
             var angle = this.angle;
-            if (this._player) {
-                angle += this._player.angle;
-            }
             angle = (360 + (angle % 360)) % 360;
             if (angle == 0) {
                 result = new bgsim.Point(innerX, innerY);
@@ -411,9 +398,6 @@
             var x, y;
 
             var angle = this.angle;
-            if (this._player) {
-                angle += this._player.angle;
-            }
             var r = angle * Math.PI / 180;
             x = point.x * Math.cos(r) - point.y * Math.sin(r);
             y = point.x * Math.sin(r) + point.y * Math.cos(r);
