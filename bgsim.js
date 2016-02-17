@@ -255,8 +255,11 @@
         });
 
         bgsim.Component.prototype.__defineSetter__('parent', function (parent) {
-            var gp = this.rectangle.point;
             if (this._parent == parent) {
+                if (parent) {
+                    parent.remove(this);
+                    parent.add(this);
+                }
                 return parent;
             }
 
@@ -266,32 +269,32 @@
 
             if (this._parent) {
                 this._parent.remove(this);
-
-                gp = this._parent.getAllGlobalPoint(gp);
             }
             if (parent) {
                 parent.add(this);
-
-                if (this._parent) {
-                    gp = parent.getAllLocalPoint(gp);
-                }
             }
 
-            this.rectangle.point = gp;
             return this._parent = parent;
         });
 
         bgsim.Component.prototype.add = function (component)
         {
+            if (component._parent) {
+                var gp = this.getAllLocalPoint(component.rectangle.point);
+                component.rectangle.point = gp;
+            }
+
             this.children.push(component);
             this.trigger('added', component);
         };
 
         bgsim.Component.prototype.remove = function (component)
         {
+            var gp = this.getAllGlobalPoint(component.rectangle.point);
+            component.rectangle.point = gp;
+
             var index = this.children.indexOf(component);
             this.children.splice(index, 1);
-
             this.trigger('removed', component);
         };
 
