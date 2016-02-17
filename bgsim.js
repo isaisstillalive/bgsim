@@ -931,7 +931,7 @@
     }
 
     // class Deck extends Area
-    bgsim.Deck = function (cards, options)
+    bgsim.Deck = function (options)
     {
         if (options === undefined) {
             options = {}
@@ -940,24 +940,22 @@
 
         this.back = !!options.back;
         this.thick = options.thick || 0;
-
-        var copyFunc = options.copy || function(i, card){};
-
-        var count = 0;
-        for (var i = 0; i < cards.length; i++) {
-            var card = cards[i][0];
-            for (var c = cards[i][1]; c--;) {
-                var copyCard = card.copy();
-                copyFunc.call(copyCard, count++, card);
-                copyCard.parent = this;
-            };
-        }
-
-        this.shuffle();
-        this.reset();
     }
     {
         util.inherits(bgsim.Deck, bgsim.Area);
+
+        bgsim.Deck.prototype.build = function (card, count, callback)
+        {
+            for (var index = 0; index < count; index++) {
+                var copyCard = card.copy();
+                if (callback) {
+                    callback.call(copyCard, index);
+                }
+                copyCard.parent = this;
+            };
+            this.shuffle();
+            this.reset();
+        };
 
         bgsim.Deck.prototype.reset = function ()
         {
