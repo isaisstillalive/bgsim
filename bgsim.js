@@ -234,9 +234,9 @@
         }
 
         this.eventHandlers = {};
-        this.control = {};
         this.children = [];
 
+        this.touchData = {};
         this.focus = false;
     }
     {
@@ -508,128 +508,138 @@
 
         bgsim.Component.prototype.sendEventTouchStart = function (point)
         {
-            this.control.isClick = true;
-            this.floating = true;
+            // タップ判定開始
+            this.touchData.tapping = this.tappable;
 
-            var self = this;
+            // ホールド判定開始
             if (this.holdable) {
-                this.control.holding = window.setTimeout(function(){
-                    self.control.holding = null;
-                    self.control.draging = null;
-                    self.control.isClick = null;
-                    if (!self.trigger('hold')) {
-                        self.hold();
-                    }
+                var self = this;
+                this.touchData.holding = window.setTimeout(function(){
+                    self.sendEventTouchFinishTrigger('hold');
                 }, 500);
+            } else {
+                this.touchData.holding = false;
             }
 
+            // 移動判定用の基準を求める
             if (this.movable) {
-                this.control.draging = {
+                this.touchData.moving = {
                     x: this.rectangle.point.x - point.x,
                     y: this.rectangle.point.y - point.y,
                 };
+
+                // タップが無効なら即座に移動判定開始
+                if (!this.tappable) {
+                    this.sendEventTouchDragStart();
+                }
+
                 var i = this.parent.children.indexOf(this);
                 this.parent.children.splice(i, 1);
                 this.parent.children.push(this);
             } else {
-                this.control.draging = null;
+                this.touchData.moving = false;
             }
-
-            console.log('dragstart', point, this.rectangle);
 
             return true;
         };
 
         bgsim.Component.prototype.sendEventTouchMove = function (point)
         {
-            if (this.control.draging == null) {
+            // 移動中でなければ何もしない
+            if (!this.touchData.moving) {
                 return;
             }
 
-            if (this.control.isClick) {
-                this.control.isClick = this.tappable && (
-                    Math.abs(this.control.draging.x - (this.rectangle.point.x - point.x)) <= 15 &&
-                    Math.abs(this.control.draging.y - (this.rectangle.point.y - point.y)) <= 15
+            // タップ判定中ならば、移動しているかどうかを調べる
+            if (this.touchData.tapping) {
+                // 移動したらタップ判定を終了し、移動判定開始
+                this.touchData.tapping = (
+                    Math.abs(this.touchData.moving.x - (this.rectangle.point.x - point.x)) <= 15 &&
+                    Math.abs(this.touchData.moving.y - (this.rectangle.point.y - point.y)) <= 15
                 );
-                if (this.control.isClick) {
+                if (this.touchData.tapping) {
                     return;
                 } else {
-                    window.clearTimeout(this.control.holding);
-                    this.control.holding = null;
-                    this.trigger('dragstart');
+                    this.sendEventTouchDragStart();
                 }
             }
 
-            this.rectangle.point.x = this.control.draging.x + point.x;
-            this.rectangle.point.y = this.control.draging.y + point.y;
+            // 移動判定開始していれば移動させる
+            this.rectangle.point.x = this.touchData.moving.x + point.x;
+            this.rectangle.point.y = this.touchData.moving.y + point.y;
+            // 移動先がcontainableならフォーカスさせる
             var gp = this.parent.getAllGlobalPoint(point);
             var component = bgsim.Game.getComponentFromPoint(gp, function (component) {
                 return component.containable;
             });
             if (component) {
-                if (this.control.focused) {
-                    this.control.focused.focus = false;
+                if (this.touchData.focused) {
+                    this.touchData.focused.focus = false;
                 }
                 component.component.focus = true;
-                this.control.focused = component.component;
+                this.touchData.focused = component.component;
             }
 
-            console.log('dragmove', point, this.rectangle);
-            // console.log(this.control.dragBaseX, this.control.dragBaseY);
-            // console.log(point);
-            // console.log(this.rectangle);
             return;
         };
 
         bgsim.Component.prototype.sendEventTouchEnd = function (point)
         {
-            if (this.control.draging) {
-                if (this.control.focused) {
-                    this.parent = this.control.focused;
-                    this.control.focused.focus = false;
-                }
-            }
-            this.control.draging = null;
-            this.floating = false;
+            // タップ判定が継続したらタップ処理を行う
+            if (this.touchData.tapping) {
+                // ホールド判定を除去
+                window.clearTimeout(this.touchData.holding);
 
-            if (this.control.isClick) {
-                window.clearTimeout(this.control.holding);
-                this.control.holding = null;
-                if (this.doubletap) {
-                    if (this.control.clicking == null) {
-                        var self = this;
-                        this.control.clicking = window.setTimeout(function(){
-                            self.control.clicking = null;
-                            if (!self.trigger('tap')) {
-                                self.tap();
-                            }
-                        }, 300);
+                // ダブルタップ判定を行う
+                if (this.doubletappable) {
+                    if (this.touchData.singletapping) {
+                        this.sendEventTouchFinishTrigger('doubletap');
                     } else {
-                        window.clearTimeout(this.control.clicking);
-                        this.control.clicking = null;
-                        if (!this.trigger('doubletap')) {
-                            this.doubletap();
-                        }
+                        var self = this;
+                        this.touchData.singletapping = window.setTimeout(function(){
+                            self.sendEventTouchFinishTrigger('tap');
+                        }, 300);
                     }
                 } else {
-                    if (!this.trigger('tap')) {
-                        this.tap();
-                    }
+                    this.sendEventTouchFinishTrigger('tap');
+                }
+            } else if (this.touchData.moving) {
+                // 移動先がフォーカスされていれば移動させる
+                if (this.touchData.focused) {
+                    this.parent = this.touchData.focused;
+                    this.touchData.focused.focus = false;
                 }
             }
+
+            this.touchData.moving = null;
+            this.floating = false;
+
             return false;
         };
 
-        bgsim.Component.prototype.hold = function ()
-        {
+        bgsim.Component.prototype.sendEventTouchDragStart = function () {
+            this.floating = true;
+
+            window.clearTimeout(this.touchData.holding);
+            this.touchData.holding = null;
+
+            this.trigger('dragstart');
         };
 
-        bgsim.Component.prototype.tap = function ()
-        {
-        };
+        bgsim.Component.prototype.sendEventTouchFinishTrigger = function (name) {
+            window.clearTimeout(this.touchData.holding);
+            window.clearTimeout(this.touchData.singletapping);
 
-        bgsim.Component.prototype.doubletap = function ()
-        {
+            this.touchData.tapping = false;
+            this.touchData.moving = false;
+            this.touchData.holding = false;
+            this.touchData.singletapping = false;
+
+            if (!this.trigger(name)) {
+                if (this[name]) {
+                    this[name].call(this);
+                }
+            }
         };
     }
 
