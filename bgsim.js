@@ -32,9 +32,9 @@
             var cons = document.getElementById('console');
             if (cons) {
                 var rows = cons.getAttribute('rows')-1 || 1;
-                console.log = function (val) {
+                console.log = function () {
                     var l = cons.innerHTML.split("\n", rows);
-                    cons.innerHTML = val + "\n" + l.join("\n");
+                    cons.innerHTML = Array.prototype.join.call(arguments, ',') + "\n" + l.join("\n");
                 }
             }
         });
