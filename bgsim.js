@@ -218,6 +218,8 @@
         this.zoom = options.zoom || 1;
         this.angle = options.angle || 0;
 
+        this.layer = options.layer;
+
         this.parent = options.parent;
 
         this.tappable = !!options.tappable;
@@ -293,28 +295,54 @@
             this.trigger('removed', component);
         };
 
-        bgsim.Component.prototype.draw = function (context)
+        bgsim.Component.prototype.draw = function (contexts)
         {
-            context.save();
-            this.rectangle.point.translate(context);
-            context.rotate(this.angle * Math.PI / 180);
-            context.scale(this.zoom, this.zoom);
-            this._draw(context);
+            for (var i = 0; i < contexts.length; i++) {
+                var context = contexts[i];
+                context.save();
+                this.rectangle.point.translate(context);
+                context.rotate(this.angle * Math.PI / 180);
+                context.scale(this.zoom, this.zoom);
+            };
+
+            this._draw(contexts);
             if (this.focus) {
-                context.fillStyle = 'rgba(255, 255, 255, 0.7)';
-                context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
+                this.drawContext(contexts).fillStyle = 'rgba(255, 255, 255, 0.7)';
+                this.drawContext(contexts).fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
             }
 
             for (var i = 0; i < this.children.length; i++) {
-                this.children[i].draw(context);
+                this.children[i].draw(contexts);
             }
 
-            context.restore();
+            for (var i = 0; i < contexts.length; i++) {
+                var context = contexts[i];
+                context.restore();
+            };
         };
 
-        bgsim.Component.prototype._draw = function (context)
+        bgsim.Component.prototype._draw = function (contexts)
         {
         };
+
+        bgsim.Component.prototype.getLayer = function (contexts)
+        {
+            var layer = 0;
+            if (this.floating) {
+                layer = contexts.length - 1;
+            } else if (this.layer) {
+                layer = this.layer;
+            } else if (this.parent) {
+                layer = this.parent.getLayer(contexts);
+            }
+
+            return layer;
+        };
+
+        bgsim.Component.prototype.drawContext = function (contexts)
+        {
+            return contexts[this.getLayer(contexts)];
+        }
 
         bgsim.Component.prototype.getComponentFromPoint = function (point, callback)
         {
@@ -622,9 +650,9 @@
     {
         util.inherits(bgsim.Board, bgsim.Component);
 
-        bgsim.Board.prototype._draw = function (context)
+        bgsim.Board.prototype._draw = function (contexts)
         {
-            this.image.draw(context, this.sprite, this.rectangle.size);
+            this.image.draw(this.drawContext(contexts), this.sprite, this.rectangle.size);
         };
 
         bgsim.Board.prototype.__defineSetter__('image', function (image) {
@@ -716,8 +744,10 @@
             return this._sleep;
         });
 
-        bgsim.Card.prototype._draw = function (context)
+        bgsim.Card.prototype._draw = function (contexts)
         {
+            var context = this.drawContext(contexts);
+
             if (!this.private) {
                 context.fillStyle = this.player.color;
                 context.fillRect(-this.rectangle.size.half_width-4, -this.rectangle.size.half_height-4, this.rectangle.size.width+8, this.rectangle.size.height+8);
@@ -749,8 +779,10 @@
     {
         util.inherits(bgsim.Label, bgsim.Component);
 
-        bgsim.Label.prototype._draw = function (context)
+        bgsim.Label.prototype._draw = function (contexts)
         {
+            var context = this.drawContext(contexts);
+
             if (this.source && this.source instanceof bgsim.Image) {
                 this.source.draw(context, this.value, this.rectangle.size);
             } else {
@@ -904,9 +936,10 @@
     {
         util.inherits(bgsim.Area, bgsim.Component);
 
-        bgsim.Area.prototype._draw = function (context)
+        bgsim.Area.prototype._draw = function (contexts)
         {
             if (this.color) {
+                var context = this.drawContext(contexts);
                 context.save();
                 context.fillStyle = this.color;
                 context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
@@ -1009,6 +1042,21 @@
                 self.canvas.addEventListener(data[0], function(e){ return data[1].call(self, e); }, false);
             });
 
+            // 画像レイヤーを3枚追加
+            // 最前面はドラッグしているコンポーネント用
+            // 0.背景、1.ボード、2.カード、3.ドラッグ用を想定
+            this.layers = [];
+            this.contexts = [
+                this.context,
+            ];
+            for (var i = 0; i < 3; i++) {
+                var layer = document.createElement("canvas");
+                layer.width = this.canvas.width;
+                layer.height = this.canvas.height;
+                this.layers.push(layer);
+                this.contexts.push(layer.getContext('2d'));
+            };
+
             this.init();
             this.draw();
         };
@@ -1024,8 +1072,14 @@
 
         Game.prototype.draw = function ()
         {
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            bgsim.Component.prototype.draw.call(this, this.context);
+            for (var i = 0; i < this.contexts.length; i++) {
+                this.contexts[i].clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+            bgsim.Component.prototype.draw.call(this, this.contexts);
+            for (var i = 0; i < this.layers.length; i++) {
+                this.context.drawImage(this.layers[i], 0, 0);
+            }
+
             var self = this;
             window.requestAnimationFrame(function(){ self.draw(); });
         };
