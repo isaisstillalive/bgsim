@@ -202,6 +202,7 @@
             options = {}
         }
 
+        this.name = options.name || 'null';
         this._player = options.player;
         this.private = !!options.private;
 
