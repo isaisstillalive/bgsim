@@ -240,6 +240,8 @@
         this.eventHandlers = {};
         this.control = {};
         this.children = [];
+
+        this.focus = false;
     }
     {
         bgsim.Component.prototype.__defineGetter__('player', function () {
@@ -307,6 +309,10 @@
             context.rotate(this.angle * Math.PI / 180);
             context.scale(this.zoom, this.zoom);
             this._draw(context);
+            if (this.focus) {
+                context.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
+            }
 
             for (var i = 0; i < this.children.length; i++) {
                 this.children[i].draw(context);
@@ -543,6 +549,17 @@
 
             this.rectangle.point.x = this.control.draging.x + point.x;
             this.rectangle.point.y = this.control.draging.y + point.y;
+            var gp = this.parent.getAllGlobalPoint(point);
+            var component = bgsim.Game.getComponentFromPoint(gp, function (component) {
+                return component.containable;
+            });
+            if (component) {
+                if (this.control.focused) {
+                    this.control.focused.focus = false;
+                }
+                component.component.focus = true;
+                this.control.focused = component.component;
+            }
 
             console.log('dragmove', point, this.rectangle);
             // console.log(this.control.dragBaseX, this.control.dragBaseY);
@@ -554,12 +571,9 @@
         bgsim.Component.prototype.sendEventTouchEnd = function (point)
         {
             if (this.control.draging) {
-                var gp = this.getAllGlobalPoint(new bgsim.Point(0, 0));
-                var component = bgsim.Game.getComponentFromPoint(gp, function (component) {
-                    return component.containable;
-                });
-                if (component) {
-                    this.parent = component.component;
+                if (this.control.focused) {
+                    this.parent = this.control.focused;
+                    this.control.focused.focus = false;
                 }
             }
             this.control.draging = null;
