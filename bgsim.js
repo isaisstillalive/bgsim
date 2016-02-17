@@ -827,6 +827,7 @@
         options.height = options.height || 50;
 
         options.doubletappable = false;
+        options.tappable = true;
         if (options.holdable == undefined) {
             options.holdable = true;
         }
@@ -941,6 +942,12 @@
     {
         if (options === undefined) {
             options = {}
+        }
+        if (!options.movable) {
+            options.movable = false;
+        }
+        if (!options.tappable) {
+            options.tappable = false;
         }
         bgsim.Component.call(this, options);
 
