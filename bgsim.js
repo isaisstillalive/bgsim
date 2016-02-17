@@ -972,6 +972,43 @@
         };
     }
 
+    // class SortedArea extends Area
+    bgsim.SortedArea = function (options)
+    {
+        if (options === undefined) {
+            options = {}
+        }
+
+        bgsim.Area.call(this, options);
+    }
+    {
+        util.inherits(bgsim.SortedArea, bgsim.Area);
+
+        bgsim.SortedArea.prototype.add = function(component)
+        {
+            bgsim.Area.prototype.add.call(this, component);
+            this.reorder();
+        };
+
+        bgsim.SortedArea.prototype.remove = function(component)
+        {
+            bgsim.Area.prototype.remove.call(this, component);
+            this.reorder();
+        };
+
+        bgsim.SortedArea.prototype.reorder = function ()
+        {
+            var left = - this.rectangle.size.half_width;
+
+            for (var i = this.children.length; i--; ) {
+                var component = this.children[i];
+
+                component.rectangle.point.x = left + i * 50 + component.rectangle.size.half_width;
+                component.rectangle.point.y = 0;
+            };
+        };
+    }
+
     // class Deck extends Area
     bgsim.Deck = function (options)
     {
