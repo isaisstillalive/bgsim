@@ -1013,11 +1013,14 @@
                 return;
             }
 
-            var base = new bgsim.Point(0, 0);
-            base.x = this.padding.x - this.rectangle.size.half_width;
-            base.y = this.padding.y - this.rectangle.size.half_height;
-
             var spacing = new bgsim.Point(this.spacing.x, this.spacing.y);
+            var order = {};
+            order.x = Math.sign(spacing.x);
+            order.y = Math.sign(spacing.y);
+
+            var base = new bgsim.Point(0, 0);
+            base.x = (this.padding.x - this.rectangle.size.half_width) * order.x;
+            base.y = (this.padding.y - this.rectangle.size.half_height) * order.y;
 
             if (this.children.length > 1) {
                 var count = this.children.length - 1;
@@ -1032,10 +1035,10 @@
                     var sdir = sdirs[i];
                     var hsdir = 'half_' + sdir;
 
-                    var children_size = this.spacing[pdir] * count;
+                    var children_size = Math.abs(this.spacing[pdir]) * count;
                     var component_size = (this.rectangle.size[sdir] - this.padding[pdir] * 2) - first_child.rectangle.size[hsdir] - last_child.rectangle.size[hsdir];
                     if (children_size > component_size) {
-                        spacing[pdir] = component_size / count;
+                        spacing[pdir] = (component_size / count) * order[pdir];
                     } else {
                         spacing[pdir] = this.spacing[pdir];
                     }
@@ -1045,8 +1048,8 @@
             for (var i = this.children.length; i--; ) {
                 var component = this.children[i];
 
-                component.rectangle.point.x = base.x + i * spacing.x + component.rectangle.size.half_width;
-                component.rectangle.point.y = base.y + i * spacing.y + component.rectangle.size.half_height;
+                component.rectangle.point.x = base.x + (i * spacing.x) + (component.rectangle.size.half_width * order.x);
+                component.rectangle.point.y = base.y + (i * spacing.y) + (component.rectangle.size.half_height * order.y);
             };
         };
     }
