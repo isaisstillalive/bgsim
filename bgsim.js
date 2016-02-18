@@ -980,6 +980,17 @@
         }
 
         bgsim.Area.call(this, options);
+
+        if (options.padding) {
+            this.padding = options.padding;
+        } else {
+            this.padding = new bgsim.Point((options.padding_x || 0), (options.padding_y || 0));
+        }
+        if (options.spacing) {
+            this.spacing = options.spacing;
+        } else {
+            this.spacing = new bgsim.Point((options.spacing_x || this.rectangle.size.width), (options.spacing_y || this.rectangle.size.height));
+        }
     }
     {
         util.inherits(bgsim.SortedArea, bgsim.Area);
@@ -998,13 +1009,44 @@
 
         bgsim.SortedArea.prototype.reorder = function ()
         {
-            var left = - this.rectangle.size.half_width;
+            if (this.children.length == 0) {
+                return;
+            }
+
+            var base = new bgsim.Point(0, 0);
+            base.x = this.padding.x - this.rectangle.size.half_width;
+            base.y = this.padding.y - this.rectangle.size.half_height;
+
+            var spacing = new bgsim.Point(this.spacing.x, this.spacing.y);
+
+            if (this.children.length > 1) {
+                var count = this.children.length - 1;
+
+                var first_child = this.children[0];
+                var last_child = this.children[count];
+
+                var pdirs = ['x', 'y'];
+                var sdirs = ['width', 'height'];
+                for (var i = 0; i < 2; i++) {
+                    var pdir = pdirs[i];
+                    var sdir = sdirs[i];
+                    var hsdir = 'half_' + sdir;
+
+                    var children_size = this.spacing[pdir] * count;
+                    var component_size = (this.rectangle.size[sdir] - this.padding[pdir] * 2) - first_child.rectangle.size[hsdir] - last_child.rectangle.size[hsdir];
+                    if (children_size > component_size) {
+                        spacing[pdir] = component_size / count;
+                    } else {
+                        spacing[pdir] = this.spacing[pdir];
+                    }
+                }
+            }
 
             for (var i = this.children.length; i--; ) {
                 var component = this.children[i];
 
-                component.rectangle.point.x = left + i * 50 + component.rectangle.size.half_width;
-                component.rectangle.point.y = 0;
+                component.rectangle.point.x = base.x + i * spacing.x + component.rectangle.size.half_width;
+                component.rectangle.point.y = base.y + i * spacing.y + component.rectangle.size.half_height;
             };
         };
     }
