@@ -1038,8 +1038,8 @@
 
             var spacing = new bgsim.Point(this.spacing.x, this.spacing.y);
             var order = {};
-            order.x = Math.sign(spacing.x);
-            order.y = Math.sign(spacing.y);
+            order.x = (spacing.x > 0 ? 1 : 0);
+            order.y = (spacing.y > 0 ? 1 : 0);
 
             var base = new bgsim.Point(0, 0);
             base.x = (this.padding.x - this.rectangle.size.half_width) * order.x;
