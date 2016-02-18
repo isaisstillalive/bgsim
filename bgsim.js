@@ -1073,8 +1073,9 @@
                 }
             }
 
-            spacing.x -= this.thick * Math.sin(this.getGlobalAngle() * Math.PI / 180);
-            spacing.y -= this.thick * Math.cos(this.getGlobalAngle() * Math.PI / 180);
+            var gangle = this.getGlobalAngle();
+            spacing.x -= this.thick * Math.sin(gangle * Math.PI / 180);
+            spacing.y -= this.thick * Math.cos(gangle * Math.PI / 180);
 
             for (var i = this.children.length; i--; ) {
                 var component = this.children[i];
