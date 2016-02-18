@@ -855,9 +855,15 @@
 
         this._min = 0;
         this.range = 0;
-        this.max = options.max || 20;
-        this.min = options.min || 0;
-        this.step = options.step || -1;
+        if (this.source instanceof Array) {
+            this.max = options.max || (this.source.length - 1);
+            this.min = options.min || 0;
+            this.step = options.step || 1;
+        } else {
+            this.max = options.max || 20;
+            this.min = options.min || 0;
+            this.step = options.step || -1;
+        }
         this.value = options.value || (this.step > 0 ? this.min : this.max);
     }
     {
