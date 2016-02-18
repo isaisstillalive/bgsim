@@ -1081,22 +1081,23 @@
         };
     }
 
-    // class Deck extends Area
+    // class Deck extends SortedArea
     bgsim.Deck = function (options)
     {
         if (options === undefined) {
             options = {}
         }
-        bgsim.Area.call(this, options);
+        options.spacing = new bgsim.Point(0, 0);
+        bgsim.SortedArea.call(this, options);
 
         this.back = !!options.back;
-        this.thick = options.thick || 0;
     }
     {
-        util.inherits(bgsim.Deck, bgsim.Area);
+        util.inherits(bgsim.Deck, bgsim.SortedArea);
 
         bgsim.Deck.prototype.build = function (card, count, callback)
         {
+            this.order = false;
             for (var index = 0; index < count; index++) {
                 var copyCard = card.copy();
                 if (callback) {
@@ -1104,21 +1105,15 @@
                 }
                 copyCard.parent = this;
             };
+            this.order = true;
             this.shuffle();
-            this.reset();
         };
 
-        bgsim.Deck.prototype.reset = function ()
+        bgsim.Deck.prototype.add = function(component)
         {
-            var y = -this.children.length*this.thick;
-            for (var i = this.children.length; i--;) {
-                var card = this.children[i];
-                card.rectangle.point.x = 0;
-                card.rectangle.point.y = y;
-                y += this.thick;
-                card.back = this.back;
-                card.private = this.private;
-            }
+            bgsim.SortedArea.prototype.add.call(this, component);
+            component.back = this.back;
+            component.private = this.private;
         };
 
         bgsim.Deck.prototype.shuffle = function ()
@@ -1129,6 +1124,7 @@
                 this.children[dst] = this.children[src];
                 this.children[src] = card;
             }
+            this.reorder();
         };
     }
 
