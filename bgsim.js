@@ -443,6 +443,15 @@
             return new bgsim.Point(x, y);
         };
 
+        bgsim.Component.prototype.getGlobalAngle = function ()
+        {
+            var angle = this.angle;
+            if (this.parent) {
+                angle += this.parent.getGlobalAngle();
+            }
+            return angle;
+        };
+
         bgsim.Component.prototype.on = function (event, handler)
         {
             this.eventHandlers[event] = this.eventHandlers[event] || []
@@ -995,6 +1004,7 @@
             var spacing_y = (options.spacing_y == undefined) ? this.rectangle.size.height : options.spacing_y;
             this.spacing = new bgsim.Point(spacing_x, spacing_y);
         }
+        this.thick = options.thick || 0;
     }
     {
         util.inherits(bgsim.SortedArea, bgsim.Area);
@@ -1052,6 +1062,9 @@
                     }
                 }
             }
+
+            spacing.x -= this.thick * Math.sin(this.getGlobalAngle() * Math.PI / 180);
+            spacing.y -= this.thick * Math.cos(this.getGlobalAngle() * Math.PI / 180);
 
             for (var i = this.children.length; i--; ) {
                 var component = this.children[i];
