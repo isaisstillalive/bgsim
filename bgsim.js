@@ -1139,21 +1139,38 @@
     {
         util.inherits(Game, bgsim.Component);
 
-        Game.prototype.start = function (canvas, init)
+        Game.prototype.start = function (div, init)
         {
-            this.canvas = canvas;
-            this.context = this.canvas.getContext('2d');
+            var style_width = window.innerWidth + 'px';
+            var style_height = window.innerHeight + 'px';
+            var canvas_width = window.innerWidth * window.devicePixelRatio;
+            var canvas_height = window.innerHeight * window.devicePixelRatio;
+
+            // 画像レイヤーを4枚作成
+            // 0.背景、1.ボード、2.カード、3.ドラッグ用を想定
+            this.layers = [];
+            this.contexts = [];
+            for (var i = 0; i < 4; i++) {
+                var layer = document.createElement('canvas');
+                div.appendChild(layer);
+                layer.width = canvas_width;
+                layer.height = canvas_height;
+                layer.style.width = style_width;
+                layer.style.height = style_height;
+                layer.style.position = 'absolute';
+                layer.style.display = 'block';
+                layer.style.backgroundColor = 'transparent';
+                layer.style.zIndex = i;
+                this.layers.push(layer);
+                this.contexts.push(layer.getContext('2d'));
+            };
+
             this.zoom = window.devicePixelRatio/2;
             this.listeningComponent = {};
-            this.init = init;
-
-            canvas.style.width = window.innerWidth + 'px';
-            canvas.style.height = window.innerHeight + 'px';
-            canvas.width = window.innerWidth * window.devicePixelRatio;
-            canvas.height = window.innerHeight * window.devicePixelRatio;
-
-            this.rectangle.point.x = canvas.width/2;
-            this.rectangle.point.y = canvas.height/2;
+            this.rectangle.point.x = canvas_width/2;
+            this.rectangle.point.y = canvas_height/2;
+            this.rectangle.size.width = canvas_width;
+            this.rectangle.size.height = canvas_height;
 
             var events = [];
             if (util.isTouch) {
@@ -1167,25 +1184,12 @@
                 events.push(['mouseup', this.mouseEventSender]);
             }
             var self = this;
+            var eventCanvas = this.layers[this.layers.length -1];
             events.forEach(function(data) {
-                self.canvas.addEventListener(data[0], function(e){ return data[1].call(self, e); }, false);
+                eventCanvas.addEventListener(data[0], function(e){ return data[1].call(self, e); }, false);
             });
 
-            // 画像レイヤーを3枚追加
-            // 最前面はドラッグしているコンポーネント用
-            // 0.背景、1.ボード、2.カード、3.ドラッグ用を想定
-            this.layers = [];
-            this.contexts = [
-                this.context,
-            ];
-            for (var i = 0; i < 3; i++) {
-                var layer = document.createElement("canvas");
-                layer.width = this.canvas.width;
-                layer.height = this.canvas.height;
-                this.layers.push(layer);
-                this.contexts.push(layer.getContext('2d'));
-            };
-
+            this.init = init;
             this.init();
             this.draw();
         };
@@ -1202,12 +1206,9 @@
         Game.prototype.draw = function ()
         {
             for (var i = 0; i < this.contexts.length; i++) {
-                this.contexts[i].clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.contexts[i].clearRect(0, 0, this.rectangle.size.width, this.rectangle.size.height);
             }
             bgsim.Component.prototype.draw.call(this, this.contexts);
-            for (var i = 0; i < this.layers.length; i++) {
-                this.context.drawImage(this.layers[i], 0, 0);
-            }
 
             var self = this;
             window.requestAnimationFrame(function(){ self.draw(); });
