@@ -509,10 +509,8 @@
 
                 case 'mouseup':
                 case 'touchend':
-                    return this.sendEventTouchEnd(point);
-
                 case 'touchcancel':
-                    return false;
+                    return this.sendEventTouchEnd(point);
             }
         };
 
