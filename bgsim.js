@@ -991,7 +991,9 @@
         if (options.spacing) {
             this.spacing = options.spacing;
         } else {
-            this.spacing = new bgsim.Point((options.spacing_x || this.rectangle.size.width), (options.spacing_y || this.rectangle.size.height));
+            var spacing_x = (options.spacing_x == undefined) ? this.rectangle.size.width : options.spacing_x;
+            var spacing_y = (options.spacing_y == undefined) ? this.rectangle.size.height : options.spacing_y;
+            this.spacing = new bgsim.Point(spacing_x, spacing_y);
         }
     }
     {
