@@ -410,7 +410,6 @@
                 result = new bgsim.Point(innerX, innerY);
             }
 
-            console.log('lp', result.toString(), this);
             return result;
         };
 
@@ -486,7 +485,6 @@
             var args = Array.prototype.slice.call(arguments, 1);
 
             var eventHandlers = this.eventHandlers[event];
-            console.log('trigger', event, eventHandlers);
             if (!eventHandlers) {
                 return;
             }
@@ -760,7 +758,6 @@
         bgsim.Card.prototype.doubletap = function ()
         {
             this.private = !this.private;
-            console.log('doubletap', this.private);
         };
 
         bgsim.Card.prototype.__defineSetter__('sleep', function (sleep) {
@@ -868,7 +865,6 @@
 
         bgsim.Counter.prototype.tap = function ()
         {
-            console.log('counter_tap');
             this.next();
         };
 
@@ -934,7 +930,6 @@
 
         bgsim.Dice.prototype.tap = function ()
         {
-            console.log('dice_tap');
             var self = this;
             var x = this.rectangle.point.x;
             var y = this.rectangle.point.y;
@@ -1251,9 +1246,7 @@
         Game.prototype.mouseEventSender = function (e)
         {
             var point = new bgsim.Point(e.offsetX, e.offsetY);
-            // console.log(point.toString());
             this.sendEvent(0, point, e);
-            // $('#console').val('mouse:' + e.type);
         };
 
         Game.prototype.sendEvent = function (id, point, e)
@@ -1275,9 +1268,6 @@
                     };
                 }
             } else {
-                // console.log('usecache:'+id);
-                // $('#console').val('usecache:' + id);
-
                 component = this.listeningComponent[id];
                 point = component.parent.getAllLocalPoint(point);
             }
@@ -1285,12 +1275,8 @@
             if (component != null) {
                 var result = component.sendEvent(id, point, e);
                 if (result === true) {
-                    // console.log('cache:'+id);
-                    // $('#console').val('cache:' + id);
                     this.listeningComponent[id] = component;
                 } else if (result === false) {
-                    // console.log('discache:'+id);
-                    // $('#console').val('discache:' + id);
                     delete this.listeningComponent[id];
                 }
                 return result;
