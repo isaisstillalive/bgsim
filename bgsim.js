@@ -681,8 +681,16 @@
             if (this._image == image) {
                 return;
             }
+
+            var base_size = this.rectangle.size;
             this._image = image;
             this.rectangle.size = image.size;
+            if (this.rectangle.size.width == undefined) {
+                this.rectangle.size.width = base_size.width;
+            }
+            if (this.rectangle.size.height == undefined) {
+                this.rectangle.size.height = base_size.height;
+            }
         });
 
         bgsim.Board.prototype.__defineGetter__('image', function() {
@@ -725,8 +733,10 @@
         bgsim.Card.prototype.copy = function ()
         {
             return new bgsim.Card(this.image, this.backImageRaw, {
-                x: this.x,
-                y: this.y,
+                x: this.rectangle.point.x,
+                y: this.rectangle.point.y,
+                width: this.rectangle.size.width,
+                height: this.rectangle.size.height,
                 movable: this.movable,
                 tappable: this.tappable,
                 doubletappable: this.doubletappable,
