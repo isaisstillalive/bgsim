@@ -981,6 +981,8 @@
 
         bgsim.Area.call(this, options);
 
+        this.order = true;
+
         if (options.padding) {
             this.padding = options.padding;
         } else {
@@ -1009,6 +1011,10 @@
 
         bgsim.SortedArea.prototype.reorder = function ()
         {
+            if (!this.order) {
+                return;
+            }
+
             if (this.children.length == 0) {
                 return;
             }
