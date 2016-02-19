@@ -491,7 +491,7 @@
 
             for (var i = eventHandlers.length; i--;) {
                 if (eventHandlers[i] == handler) {
-                    delete eventHandlers[i];
+                    eventHandlers.splice(i, 1);
                 }
             }
         };
