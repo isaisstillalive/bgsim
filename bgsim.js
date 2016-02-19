@@ -499,8 +499,8 @@
         bgsim.Component.prototype.one = function (event, handler)
         {
             var tempHandler = function () {
-                handler.call(this);
                 this.off(event, tempHandler);
+                return handler.call(this);
             };
             this.on(event, tempHandler);
         };
