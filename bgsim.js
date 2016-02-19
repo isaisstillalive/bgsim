@@ -268,32 +268,31 @@
                 return parent;
             }
 
+            var original_parent = this._parent;
+
             if (this._parent) {
                 this._parent.remove(this);
+                this.rectangle.point = this._parent.getAllGlobalPoint(this.rectangle.point);
             }
+            this._parent = parent;
             if (parent) {
+                if (original_parent) {
+                    this.rectangle.point = parent.getAllLocalPoint(this.rectangle.point);
+                }
                 parent.add(this);
             }
-
-            return this._parent = parent;
+            
+            return this._parent;
         });
 
         bgsim.Component.prototype.add = function (component)
         {
-            if (component._parent) {
-                var gp = this.getAllLocalPoint(component.rectangle.point);
-                component.rectangle.point = gp;
-            }
-
             this.children.push(component);
             this.trigger('added', component);
         };
 
         bgsim.Component.prototype.remove = function (component)
         {
-            var gp = this.getAllGlobalPoint(component.rectangle.point);
-            component.rectangle.point = gp;
-
             var index = this.children.indexOf(component);
             this.children.splice(index, 1);
             this.trigger('removed', component);
