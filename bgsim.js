@@ -1144,6 +1144,47 @@
         };
     }
 
+    // class Stock extends Area
+    bgsim.Stock = function (options)
+    {
+        if (options === undefined) {
+            options = {}
+        }
+        bgsim.Area.call(this, options);
+
+        this.source = options.source;
+        this.copying = true;
+        this.source.copy().parent = this;
+        this.source.copy().parent = this;
+        this.copying = false;
+    }
+    {
+        util.inherits(bgsim.Stock, bgsim.Area);
+
+        bgsim.Stock.prototype.allowContain = function(component)
+        {
+            return (component.name == this.source.name);
+        };
+
+        bgsim.Stock.prototype.add = function(component)
+        {
+            if (this.copying) {
+                bgsim.Area.prototype.add.call(this, component);
+            } else {
+                component._parent = null
+            }
+        };
+
+        bgsim.Stock.prototype.remove = function(component)
+        {
+            bgsim.Area.prototype.remove.call(this, component);
+
+            this.copying = true;
+            this.source.copy().parent = this;
+            this.copying = false;
+        };
+    }
+
     // class Game extends Component
     var Game = function ()
     {
