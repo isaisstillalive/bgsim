@@ -217,6 +217,7 @@
         }
         this.zoom = options.zoom || 1;
         this.angle = options.angle || 0;
+        this.visible = (options.visible == undefined) || !!options.visible;
 
         this.layer = options.layer;
         this.color = options.color;
@@ -325,6 +326,10 @@
 
         bgsim.Component.prototype.draw = function (contexts)
         {
+            if (!this.visible) {
+                return;
+            }
+
             for (var i = 0; i < contexts.length; i++) {
                 var context = contexts[i];
                 context.save();
@@ -396,6 +401,10 @@
 
         bgsim.Component.prototype.within = function (point)
         {
+            if (!this.visible) {
+                return false;
+            }
+
             return (point.x >= -this.rectangle.size.half_width && point.x <= this.rectangle.size.half_width &&
                     point.y >= -this.rectangle.size.half_height && point.y <= this.rectangle.size.half_height);
         };
