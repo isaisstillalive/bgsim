@@ -1104,7 +1104,7 @@
         options.spacing = new bgsim.Point(0, 0);
         bgsim.SortedArea.call(this, options);
 
-        this.back = !!options.back;
+        this.back = options.back;
     }
     {
         util.inherits(bgsim.Deck, bgsim.SortedArea);
@@ -1126,7 +1126,9 @@
         bgsim.Deck.prototype.add = function(component)
         {
             bgsim.SortedArea.prototype.add.call(this, component);
-            component.back = this.back;
+            if (this.back != null) {
+                component.back = this.back;
+            }
             component.private = this.private;
         };
 
