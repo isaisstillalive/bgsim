@@ -569,6 +569,7 @@
                 var i = this.parent.children.indexOf(this);
                 this.parent.children.splice(i, 1);
                 this.parent.children.push(this);
+                this.sendEventTouchMove(point);
             } else {
                 this.touchData.moving = false;
             }
