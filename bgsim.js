@@ -729,25 +729,28 @@
 
         this._sleep = false;
         this.sleep = !!options.sleep;
+
+        this.options = options;
     }
     {
         util.inherits(bgsim.Card, bgsim.Board);
 
         bgsim.Card.prototype.copy = function ()
         {
-            return new bgsim.Card(this.image, this.backImageRaw, {
-                x: this.rectangle.point.x,
-                y: this.rectangle.point.y,
-                width: this.rectangle.size.width,
-                height: this.rectangle.size.height,
-                movable: this.movable,
-                tappable: this.tappable,
-                doubletappable: this.doubletappable,
-                holdable: this.holdable,
-                back: this.back,
-                sleep: this.sleep,
-                sprite: this.sprite,
-            });
+            var card = new bgsim.Card(this.image, this.backImageRaw, this.options);
+
+            for (var event in this.eventHandlers) {
+                var eventHandlers = this.eventHandlers[event];
+                card.eventHandlers[event] = [];
+                Array.prototype.push.apply(card.eventHandlers[event], eventHandlers);
+            };
+            for (var i in this) {
+                if (this[i] instanceof Function && this[i] != bgsim.Card.prototype[i]) {
+                    card[i] = this[i];
+                }
+            };
+
+            return card;
         };
 
         bgsim.Card.prototype.hold = function ()
