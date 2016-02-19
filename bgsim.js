@@ -239,8 +239,28 @@
 
         this.touchData = {};
         this.focus = false;
+
+        this.options = options;
     }
     {
+        bgsim.Component.prototype.copy = function ()
+        {
+            var component = new this.constructor(this.options);
+
+            for (var event in this.eventHandlers) {
+                var eventHandlers = this.eventHandlers[event];
+                component.eventHandlers[event] = [];
+                Array.prototype.push.apply(component.eventHandlers[event], eventHandlers);
+            };
+            for (var i in this) {
+                if (this[i] instanceof Function && (!this.prototype || this[i] != this.prototype[i])) {
+                    component[i] = this[i];
+                }
+            };
+
+            return component;
+        };
+
         bgsim.Component.prototype.__defineGetter__('player', function () {
             if (this._player) {
                 return this._player;
@@ -732,29 +752,9 @@
 
         this._sleep = false;
         this.sleep = !!options.sleep;
-
-        this.options = options;
     }
     {
         util.inherits(bgsim.Card, bgsim.Board);
-
-        bgsim.Card.prototype.copy = function ()
-        {
-            var card = new bgsim.Card(this.options);
-
-            for (var event in this.eventHandlers) {
-                var eventHandlers = this.eventHandlers[event];
-                card.eventHandlers[event] = [];
-                Array.prototype.push.apply(card.eventHandlers[event], eventHandlers);
-            };
-            for (var i in this) {
-                if (this[i] instanceof Function && this[i] != bgsim.Card.prototype[i]) {
-                    card[i] = this[i];
-                }
-            };
-
-            return card;
-        };
 
         bgsim.Card.prototype.hold = function ()
         {
