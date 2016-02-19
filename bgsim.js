@@ -514,11 +514,11 @@
                 return;
             }
 
-            var result = false;
-            eventHandlers.forEach(function (eventHandler) {
-                result = eventHandler.apply(this, args) || result;
-            }, this);
-            return result;
+            for (var i = eventHandlers.length; i--;) {
+                if (eventHandlers[i].apply(this, args) === false) {
+                    return false;
+                }
+            };
         };
 
         bgsim.Component.prototype.sendEvent = function (id, point, e)
@@ -670,7 +670,7 @@
             this.touchData.holding = false;
             this.touchData.singletapping = false;
 
-            if (!this.trigger(name)) {
+            if (this.trigger(name) !== false) {
                 if (this[name]) {
                     this[name].call(this);
                 }
