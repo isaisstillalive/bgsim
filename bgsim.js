@@ -612,6 +612,7 @@
                     this.sendEventTouchFinishTrigger('tap');
                 }
             } else if (this.touchData.moving) {
+                this.trigger('dragend');
                 // 移動先がフォーカスされていれば移動させる
                 if (this.touchData.focused) {
                     this.parent = this.touchData.focused;
