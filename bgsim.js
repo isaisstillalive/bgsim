@@ -220,7 +220,7 @@
 
         this.layer = options.layer;
         this.color = options.color;
-        
+
         this.parent = options.parent;
 
         this.tappable = !!options.tappable;
@@ -281,7 +281,7 @@
                 }
                 parent.add(this);
             }
-            
+
             return this._parent;
         });
 
