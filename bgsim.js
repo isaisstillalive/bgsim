@@ -189,7 +189,7 @@
         this.name = options.name || 'player';
         this.private = !!options.private;
 
-        this.color = options.color || 'rgba(255, 70, 70, 0.5)';
+        this.color = options.color || 'rgba(0,0,0,0)';
     }
     {
         bgsim.Player.Empty = new bgsim.Player();
@@ -219,7 +219,8 @@
         this.angle = options.angle || 0;
 
         this.layer = options.layer;
-
+        this.color = options.color;
+        
         this.parent = options.parent;
 
         this.tappable = !!options.tappable;
@@ -788,8 +789,12 @@
         {
             var context = this.drawContext(contexts);
 
-            if (!this.private) {
-                context.fillStyle = this.player.color;
+            var color = this.color;
+            if (color === undefined) {
+                color = this.player.color;
+            }
+            if (!this.private && color) {
+                context.fillStyle = color;
                 context.fillRect(-this.rectangle.size.half_width-4, -this.rectangle.size.half_height-4, this.rectangle.size.width+8, this.rectangle.size.height+8);
             }
 
@@ -982,8 +987,6 @@
             options.tappable = false;
         }
         bgsim.Component.call(this, options);
-
-        this.color = options.color;
     }
     {
         util.inherits(bgsim.Area, bgsim.Component);
