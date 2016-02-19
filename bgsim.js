@@ -298,6 +298,11 @@
             this.trigger('removed', component);
         };
 
+        bgsim.Component.prototype.allowContain = function (component)
+        {
+            return true;
+        };
+
         bgsim.Component.prototype.draw = function (contexts)
         {
             for (var i = 0; i < contexts.length; i++) {
@@ -577,8 +582,9 @@
             this.rectangle.point.y = this.touchData.moving.y + point.y;
             // 移動先がcontainableならフォーカスさせる
             var gp = this.parent.getAllGlobalPoint(point);
+            var self = this;
             var component = bgsim.Game.getComponentFromPoint(gp, function (component) {
-                return component.containable;
+                return component.containable && component.allowContain(self);
             });
             if (component) {
                 if (this.touchData.focused) {
