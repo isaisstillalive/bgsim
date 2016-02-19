@@ -659,7 +659,7 @@
     }
 
     // class Board extends Component
-    bgsim.Board = function (image, options)
+    bgsim.Board = function (options)
     {
         if (!options) {
             options = {}
@@ -669,7 +669,7 @@
         }
 
         bgsim.Component.call(this, options);
-        this.image = bgsim.Image.create(image);
+        this.image = bgsim.Image.create(options.image);
         this.sprite = options.sprite;
     }
     {
@@ -702,7 +702,7 @@
     }
 
     // class Card extends Board
-    bgsim.Card = function (frontImage, backImage, options)
+    bgsim.Card = function (options)
     {
         if (!options) {
             options = {}
@@ -713,16 +713,19 @@
         if (options.holdable == undefined) {
             options.holdable = true;
         }
-        bgsim.Board.call(this, frontImage, options);
+        bgsim.Board.call(this, options);
 
-        this.backImageRaw = backImage;
-        this.backImage = this.frontImage = this.image;
+        this.frontImage = this.image;
         this.frontSprite = this.sprite;
-        if (typeof backImage === 'number' || backImage instanceof Number) {
-            this.backSprite = backImage;
+        if (options.backImage) {
+            this.backImage = bgsim.Image.create(options.backImage);
         } else {
-            this.backImage = bgsim.Image.create(backImage);
-            this.backSprite = undefined;
+            this.backImage = this.frontImage;
+        }
+        if (options.backSprite) {
+            this.backSprite = options.backSprite;
+        } else {
+            this.backSprite = options.frontSprite;
         }
 
         this.back = !!options.back;
@@ -737,7 +740,7 @@
 
         bgsim.Card.prototype.copy = function ()
         {
-            var card = new bgsim.Card(this.image, this.backImageRaw, this.options);
+            var card = new bgsim.Card(this.options);
 
             for (var event in this.eventHandlers) {
                 var eventHandlers = this.eventHandlers[event];
@@ -806,7 +809,7 @@
     }
 
     // class Label extends Component
-    bgsim.Label = function (value, options)
+    bgsim.Label = function (options)
     {
         if (!options) {
             options = {}
@@ -817,7 +820,7 @@
 
         bgsim.Component.call(this, options);
 
-        this.value = value;
+        this.value = options.value;
         this.source = options.source;
     }
     {
@@ -863,7 +866,7 @@
             options.holdable = true;
         }
 
-        bgsim.Label.call(this, null, options);
+        bgsim.Label.call(this, options);
 
         this._min = 0;
         this.range = 0;
