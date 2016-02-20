@@ -1226,10 +1226,13 @@
         }
         bgsim.Area.call(this, options);
 
+        this.limit = Math.max(0, options.limit) || Infinity;
+
         this.source = options.source;
         this.copying = true;
-        this.source.copy().parent = this;
-        this.source.copy().parent = this;
+        for (var i = Math.min(this.limit, 2); i--;) {
+            this.source.copy().parent = this;
+        };
         this.copying = false;
     }
     {
@@ -1245,7 +1248,15 @@
             if (this.copying) {
                 bgsim.Area.prototype.add.call(this, component);
             } else {
-                component._parent = null
+                // 2枚目までは入れるが3枚目以降は消す
+                if (this.limit < 2) {
+                    bgsim.Area.prototype.add.call(this, component);
+                    component.location.x = 0;
+                    component.location.y = 0;
+                } else {
+                    component._parent = null
+                }
+                this.limit++;
             }
         };
 
@@ -1253,9 +1264,13 @@
         {
             bgsim.Area.prototype.remove.call(this, component);
 
-            this.copying = true;
-            this.source.copy().parent = this;
-            this.copying = false;
+            // 2枚以上残っていれば複製する
+            this.limit--;
+            if (this.limit >= 2) {
+                this.copying = true;
+                this.source.copy().parent = this;
+                this.copying = false;
+            }
         };
     }
 
