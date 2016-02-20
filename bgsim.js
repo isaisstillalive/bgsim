@@ -167,13 +167,19 @@
                     self.shape.height = this.height / self.sprites[1];
                 }
             };
-            if (this.image.complete) {
-                onload.call(this.image);
-            }
-            this.image.addEventListener('load', onload);
+
+            this.addEventListener('load', onload);
         }
     }
     {
+        bgsim.Image.prototype.addEventListener = function (event, callback)
+        {
+            this.image.addEventListener(event, callback);
+            if (this.image.complete) {
+                callback.call(this.image);
+            }
+        };
+
         bgsim.Image.prototype.loadImage = function (image)
         {
             switch (Object.prototype.toString.call(image)) {
@@ -189,13 +195,17 @@
             }
         };
 
-        bgsim.Image.create = function (image)
+        bgsim.Image.create = function (image, callback)
         {
-            if (image instanceof bgsim.Image) {
-                return image;
-            } else {
-                return new bgsim.Image(image);
+            if (!(image instanceof bgsim.Image)) {
+                image = new bgsim.Image(image);
             }
+            if (callback) {
+                image.addEventListener('load', function () {
+                    callback.call(image);
+                });
+            }
+            return image;
         }
 
         bgsim.Image.prototype.draw = function(context, sprite, size) {
@@ -754,15 +764,14 @@
                 return;
             }
 
-            var base_size = this.shape;
-            this._image = bgsim.Image.create(image);
-            this.shape = image.shape;
-            if (this.shape.width == undefined) {
-                this.shape.width = base_size.width;
-            }
-            if (this.shape.height == undefined) {
-                this.shape.height = base_size.height;
-            }
+            var self = this;
+            this._image = bgsim.Image.create(image, function () {
+                if (self.shape.constructor != this.shape.constructor) {
+                    self.shape = new this.shape.constructor;
+                }
+                self.shape.width = this.shape.width;
+                self.shape.height = this.shape.height;
+            })
         });
 
         bgsim.Board.prototype.__defineGetter__('image', function() {
