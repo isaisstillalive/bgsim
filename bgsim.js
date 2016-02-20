@@ -206,14 +206,14 @@
         this._player = options.player;
         this.private = !!options.private;
 
-        if (options.rectangle) {
-            this.rectangle = options.rectangle;
+        if (options.shape) {
+            this.shape = options.shape;
         } else {
             var x = options.x || 0;
             var y = options.y || 0;
             var width = options.width || 100;
             var height = options.height || 100;
-            this.rectangle = new bgsim.Rectangle(x, y, width, height);
+            this.shape = new bgsim.Rectangle(x, y, width, height);
         }
         this.zoom = options.zoom || 1;
         this.angle = options.angle || 0;
@@ -293,12 +293,12 @@
 
             if (this._parent) {
                 this._parent.remove(this);
-                this.rectangle.point = this._parent.getAllGlobalPoint(this.rectangle.point);
+                this.shape.point = this._parent.getAllGlobalPoint(this.shape.point);
             }
             this._parent = parent;
             if (parent) {
                 if (original_parent) {
-                    this.rectangle.point = parent.getAllLocalPoint(this.rectangle.point);
+                    this.shape.point = parent.getAllLocalPoint(this.shape.point);
                 }
                 parent.add(this);
             }
@@ -333,7 +333,7 @@
             for (var i = 0; i < contexts.length; i++) {
                 var context = contexts[i];
                 context.save();
-                this.rectangle.point.translate(context);
+                this.shape.point.translate(context);
                 context.rotate(this.angle * Math.PI / 180);
                 context.scale(this.zoom, this.zoom);
             };
@@ -341,7 +341,7 @@
             this._draw(contexts);
             if (this.focus) {
                 this.drawContext(contexts).fillStyle = 'rgba(255, 255, 255, 0.7)';
-                this.drawContext(contexts).fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
+                this.drawContext(contexts).fillRect(-this.shape.size.half_width, -this.shape.size.half_height, this.shape.size.width, this.shape.size.height);
             }
 
             for (var i = 0; i < this.children.length; i++) {
@@ -405,8 +405,8 @@
                 return false;
             }
 
-            return (point.x >= -this.rectangle.size.half_width && point.x <= this.rectangle.size.half_width &&
-                    point.y >= -this.rectangle.size.half_height && point.y <= this.rectangle.size.half_height);
+            return (point.x >= -this.shape.size.half_width && point.x <= this.shape.size.half_width &&
+                    point.y >= -this.shape.size.half_height && point.y <= this.shape.size.half_height);
         };
 
         bgsim.Component.prototype.getAllLocalPoint = function (point)
@@ -420,8 +420,8 @@
 
         bgsim.Component.prototype.getLocalPoint = function (point)
         {
-            var innerX = (point.x - this.rectangle.point.x) / this.zoom;
-            var innerY = (point.y - this.rectangle.point.y) / this.zoom;
+            var innerX = (point.x - this.shape.point.x) / this.zoom;
+            var innerY = (point.y - this.shape.point.y) / this.zoom;
             var result;
 
             var angle = this.angle;
@@ -470,8 +470,8 @@
             x *= this.zoom;
             y *= this.zoom;
 
-            x += this.rectangle.point.x;
-            y += this.rectangle.point.y;
+            x += this.shape.point.x;
+            y += this.shape.point.y;
 
             return new bgsim.Point(x, y);
         };
@@ -575,8 +575,8 @@
             // 移動判定用の基準を求める
             if (this.movable) {
                 this.touchData.moving = {
-                    x: this.rectangle.point.x - point.x,
-                    y: this.rectangle.point.y - point.y,
+                    x: this.shape.point.x - point.x,
+                    y: this.shape.point.y - point.y,
                 };
 
                 // タップが無効なら即座に移動判定開始
@@ -606,8 +606,8 @@
             if (this.touchData.tapping) {
                 // 移動したらタップ判定を終了し、移動判定開始
                 this.touchData.tapping = (
-                    Math.abs(this.touchData.moving.x - (this.rectangle.point.x - point.x)) <= 15 &&
-                    Math.abs(this.touchData.moving.y - (this.rectangle.point.y - point.y)) <= 15
+                    Math.abs(this.touchData.moving.x - (this.shape.point.x - point.x)) <= 15 &&
+                    Math.abs(this.touchData.moving.y - (this.shape.point.y - point.y)) <= 15
                 );
                 if (this.touchData.tapping) {
                     return;
@@ -617,8 +617,8 @@
             }
 
             // 移動判定開始していれば移動させる
-            this.rectangle.point.x = this.touchData.moving.x + point.x;
-            this.rectangle.point.y = this.touchData.moving.y + point.y;
+            this.shape.point.x = this.touchData.moving.x + point.x;
+            this.shape.point.y = this.touchData.moving.y + point.y;
             // 移動先がcontainableならフォーカスさせる
             var gp = this.parent.getAllGlobalPoint(point);
             var self = this;
@@ -716,7 +716,7 @@
 
         bgsim.Board.prototype._draw = function (contexts)
         {
-            this.image.draw(this.drawContext(contexts), this.sprite, this.rectangle.size);
+            this.image.draw(this.drawContext(contexts), this.sprite, this.shape.size);
         };
 
         bgsim.Board.prototype.__defineSetter__('image', function (image) {
@@ -724,14 +724,14 @@
                 return;
             }
 
-            var base_size = this.rectangle.size;
+            var base_size = this.shape.size;
             this._image = image;
-            this.rectangle.size = image.size;
-            if (this.rectangle.size.width == undefined) {
-                this.rectangle.size.width = base_size.width;
+            this.shape.size = image.size;
+            if (this.shape.size.width == undefined) {
+                this.shape.size.width = base_size.width;
             }
-            if (this.rectangle.size.height == undefined) {
-                this.rectangle.size.height = base_size.height;
+            if (this.shape.size.height == undefined) {
+                this.shape.size.height = base_size.height;
             }
         });
 
@@ -816,13 +816,13 @@
             }
             if (!this.private && color) {
                 context.fillStyle = color;
-                context.fillRect(-this.rectangle.size.half_width-4, -this.rectangle.size.half_height-4, this.rectangle.size.width+8, this.rectangle.size.height+8);
+                context.fillRect(-this.shape.size.half_width-4, -this.shape.size.half_height-4, this.shape.size.width+8, this.shape.size.height+8);
             }
 
             if (this.back || (this.private && this.player.private)) {
-                this.backImage.draw(context, this.backSprite, this.rectangle.size);
+                this.backImage.draw(context, this.backSprite, this.shape.size);
             } else {
-                this.frontImage.draw(context, this.frontSprite, this.rectangle.size);
+                this.frontImage.draw(context, this.frontSprite, this.shape.size);
             }
         };
     }
@@ -850,20 +850,20 @@
             var context = this.drawContext(contexts);
 
             if (this.source && this.source instanceof bgsim.Image) {
-                this.source.draw(context, this.value, this.rectangle.size);
+                this.source.draw(context, this.value, this.shape.size);
             } else {
                 context.save();
                 context.fillStyle = '#fff';
-                context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
+                context.fillRect(-this.shape.size.half_width, -this.shape.size.half_height, this.shape.size.width, this.shape.size.height);
                 context.strokeStyle = '#000';
-                context.strokeRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
+                context.strokeRect(-this.shape.size.half_width, -this.shape.size.half_height, this.shape.size.width, this.shape.size.height);
                 context.font = '80px monospace';
                 context.textAlign = 'center';
                 context.fillStyle = '#000';
                 if (this.source instanceof Array && this.source[this.value] !== undefined) {
-                    context.fillText(this.source[this.value], 0, 30, this.rectangle.size.width);
+                    context.fillText(this.source[this.value], 0, 30, this.shape.size.width);
                 } else {
-                    context.fillText(this.value, 0, 30, this.rectangle.size.width);
+                    context.fillText(this.value, 0, 30, this.shape.size.width);
                 }
                 context.restore();
             }
@@ -971,22 +971,22 @@
         bgsim.Dice.prototype.tap = function ()
         {
             var self = this;
-            var x = this.rectangle.point.x;
-            var y = this.rectangle.point.y;
+            var x = this.shape.point.x;
+            var y = this.shape.point.y;
             var angle = this.angle;
 
             var rolling = function(count) {
                 if (count < 0) {
-                    self.rectangle.point.x = x;
-                    self.rectangle.point.y = y;
+                    self.shape.point.x = x;
+                    self.shape.point.y = y;
                     self.angle = angle;
                     return;
                 }
 
                 self.next();
                 if (self.jiggle > 0) {
-                    self.rectangle.point.x = x + util.getRandom(-self.jiggle, self.jiggle);
-                    self.rectangle.point.y = y + util.getRandom(-self.jiggle, self.jiggle);
+                    self.shape.point.x = x + util.getRandom(-self.jiggle, self.jiggle);
+                    self.shape.point.y = y + util.getRandom(-self.jiggle, self.jiggle);
                     self.angle = angle + util.getRandom(-self.jiggle, self.jiggle);
                 }
                 setTimeout(rolling, 30, count-1);
@@ -1018,7 +1018,7 @@
                 var context = this.drawContext(contexts);
                 context.save();
                 context.fillStyle = this.color;
-                context.fillRect(-this.rectangle.size.half_width, -this.rectangle.size.half_height, this.rectangle.size.width, this.rectangle.size.height);
+                context.fillRect(-this.shape.size.half_width, -this.shape.size.half_height, this.shape.size.width, this.shape.size.height);
                 context.restore();
             }
         };
@@ -1043,8 +1043,8 @@
         if (options.spacing) {
             this.spacing = options.spacing;
         } else {
-            var spacing_x = (options.spacing_x == undefined) ? this.rectangle.size.width : options.spacing_x;
-            var spacing_y = (options.spacing_y == undefined) ? this.rectangle.size.height : options.spacing_y;
+            var spacing_x = (options.spacing_x == undefined) ? this.shape.size.width : options.spacing_x;
+            var spacing_y = (options.spacing_y == undefined) ? this.shape.size.height : options.spacing_y;
             this.spacing = new bgsim.Point(spacing_x, spacing_y);
         }
         this.thick = options.thick || 0;
@@ -1080,8 +1080,8 @@
             order.y = (spacing.y > 0 ? 1 : 0);
 
             var base = new bgsim.Point(0, 0);
-            base.x = (this.padding.x - this.rectangle.size.half_width) * order.x;
-            base.y = (this.padding.y - this.rectangle.size.half_height) * order.y;
+            base.x = (this.padding.x - this.shape.size.half_width) * order.x;
+            base.y = (this.padding.y - this.shape.size.half_height) * order.y;
 
             if (this.children.length > 1) {
                 var count = this.children.length - 1;
@@ -1097,7 +1097,7 @@
                     var hsdir = 'half_' + sdir;
 
                     var children_size = Math.abs(this.spacing[pdir]) * count;
-                    var component_size = (this.rectangle.size[sdir] - this.padding[pdir] * 2) - first_child.rectangle.size[hsdir] - last_child.rectangle.size[hsdir];
+                    var component_size = (this.shape.size[sdir] - this.padding[pdir] * 2) - first_child.shape.size[hsdir] - last_child.shape.size[hsdir];
                     if (children_size > component_size) {
                         spacing[pdir] = (component_size / count) * order[pdir];
                     } else {
@@ -1113,8 +1113,8 @@
             for (var i = this.children.length; i--; ) {
                 var component = this.children[i];
 
-                component.rectangle.point.x = base.x + (i * spacing.x) + (component.rectangle.size.half_width * order.x);
-                component.rectangle.point.y = base.y + (i * spacing.y) + (component.rectangle.size.half_height * order.y);
+                component.shape.point.x = base.x + (i * spacing.x) + (component.shape.size.half_width * order.x);
+                component.shape.point.y = base.y + (i * spacing.y) + (component.shape.size.half_height * order.y);
             };
         };
 
@@ -1259,10 +1259,10 @@
 
             this.zoom = window.devicePixelRatio/2;
             this.listeningComponent = {};
-            this.rectangle.point.x = canvas_width/2;
-            this.rectangle.point.y = canvas_height/2;
-            this.rectangle.size.width = canvas_width;
-            this.rectangle.size.height = canvas_height;
+            this.shape.point.x = canvas_width/2;
+            this.shape.point.y = canvas_height/2;
+            this.shape.size.width = canvas_width;
+            this.shape.size.height = canvas_height;
 
             var events = [];
             if (util.isTouch) {
@@ -1298,7 +1298,7 @@
         Game.prototype.draw = function ()
         {
             for (var i = 0; i < this.contexts.length; i++) {
-                this.contexts[i].clearRect(0, 0, this.rectangle.size.width, this.rectangle.size.height);
+                this.contexts[i].clearRect(0, 0, this.shape.size.width, this.shape.size.height);
             }
             bgsim.Component.prototype.draw.call(this, this.contexts);
 
