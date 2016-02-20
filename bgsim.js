@@ -1117,6 +1117,17 @@
                 component.rectangle.point.y = base.y + (i * spacing.y) + (component.rectangle.size.half_height * order.y);
             };
         };
+
+        bgsim.SortedArea.prototype.sort = function()
+        {
+            this.children.sort(this.compare);
+            this.reorder();
+        };
+
+        bgsim.SortedArea.prototype.compare = function(a, b)
+        {
+            return 0;
+        };
     }
 
     // class Deck extends SortedArea
