@@ -102,17 +102,26 @@
         bgsim.Shape.prototype.toString = function() {
             return '[' + this.width + ',' + this.height + ']';
         };
+
+        bgsim.Shape.prototype.within = function(point) {
+            return false;
+        };
     }
 
-    bgsim.Rectangle = function (x, y, width, height)
+    bgsim.Rectangle = function (width, height)
     {
-        this.point = new bgsim.Point(x, y);
-        this.size = new bgsim.Size(width, height);
+        bgsim.Shape.call(this, width, height);
     }
     {
+        util.inherits(bgsim.Rectangle, bgsim.Shape);
+
+        bgsim.Rectangle.prototype.within = function(point) {
+            return (point.x >= -this.half_width && point.x <= this.half_width &&
+                    point.y >= -this.half_height && point.y <= this.half_height);
+        };
 
         bgsim.Rectangle.prototype.toString = function() {
-            return '[' + this.point + ',' + this.size + ']';
+            return 'Rectangle' + bgsim.Rectangle.prototype.toString.call(this);
         };
     }
 
@@ -406,8 +415,7 @@
                 return false;
             }
 
-            return (point.x >= -this.shape.half_width && point.x <= this.shape.half_width &&
-                    point.y >= -this.shape.half_height && point.y <= this.shape.half_height);
+            return this.shape.within(point);
         };
 
         bgsim.Component.prototype.getAllLocalPoint = function (point)
