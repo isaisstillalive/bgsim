@@ -485,6 +485,15 @@
             return angle;
         };
 
+        bgsim.Component.prototype.getGlobalZoom = function ()
+        {
+            var zoom = this.zoom;
+            if (this.parent) {
+                zoom *= this.parent.getGlobalZoom();
+            }
+            return zoom;
+        };
+
         bgsim.Component.prototype.on = function (event, handler)
         {
             this.eventHandlers[event] = this.eventHandlers[event] || []
