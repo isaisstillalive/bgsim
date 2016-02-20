@@ -738,7 +738,7 @@
         }
 
         bgsim.Component.call(this, options);
-        this.image = bgsim.Image.create(options.image);
+        this.image = options.image;
         this.sprite = options.sprite;
     }
     {
@@ -755,7 +755,7 @@
             }
 
             var base_size = this.shape;
-            this._image = image;
+            this._image = bgsim.Image.create(image);
             this.shape = image.shape;
             if (this.shape.width == undefined) {
                 this.shape.width = base_size.width;
