@@ -125,6 +125,23 @@
         };
     }
 
+    bgsim.Circle = function (width, height)
+    {
+        bgsim.Shape.call(this, width, height);
+    }
+    {
+        util.inherits(bgsim.Circle, bgsim.Shape);
+
+        bgsim.Circle.prototype.within = function(point) {
+            var length = Math.sqrt(Math.pow(point.x / this.half_width, 2) + Math.pow(point.y / this.half_height, 2));
+            return (length <= 1);
+        };
+
+        bgsim.Circle.prototype.toString = function() {
+            return 'Circle' + bgsim.Rectangle.prototype.toString.call(this);
+        };
+    }
+
     bgsim.Image = function (image, options)
     {
         if (options === undefined) {
