@@ -75,31 +75,31 @@
 
     }
 
-    bgsim.Size = function (width, height)
+    bgsim.Shape = function (width, height)
     {
         this.width = width;
         this.height = height;
     }
     {
-        bgsim.Size.prototype.__defineGetter__('width', function() {
+        bgsim.Shape.prototype.__defineGetter__('width', function() {
             return this._width;
         });
 
-        bgsim.Size.prototype.__defineSetter__('width', function(width) {
+        bgsim.Shape.prototype.__defineSetter__('width', function(width) {
             this.half_width = width / 2;
             return this._width = width;
         });
 
-        bgsim.Size.prototype.__defineGetter__('height', function() {
+        bgsim.Shape.prototype.__defineGetter__('height', function() {
             return this._height;
         });
 
-        bgsim.Size.prototype.__defineSetter__('height', function(height) {
+        bgsim.Shape.prototype.__defineSetter__('height', function(height) {
             this.half_height = height / 2;
             return this._height = height;
         });
 
-        bgsim.Size.prototype.toString = function() {
+        bgsim.Shape.prototype.toString = function() {
             return '[' + this.width + ',' + this.height + ']';
         };
     }
@@ -122,7 +122,7 @@
             options = {}
         }
 
-        this.size = new bgsim.Size(options.width, options.height);
+        this.size = new bgsim.Shape(options.width, options.height);
         this.crip = new bgsim.Point(0, 0);
         this.image = this.loadImage(image);
         this.sprites = options.sprites || [1, 1];
@@ -214,7 +214,7 @@
         if (options.shape) {
             this.shape = options.shape;
         } else {
-            this.shape = new bgsim.Size((options.width || 0), (options.height || 0));
+            this.shape = new bgsim.Shape((options.width || 0), (options.height || 0));
         }
         this.zoom = options.zoom || 1;
         this.angle = options.angle || 0;
