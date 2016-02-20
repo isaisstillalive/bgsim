@@ -1323,7 +1323,9 @@
             var component = null;
 
             if (this.listeningComponent[id] == undefined) {
-                component = this.getComponentFromPoint(point);
+                component = this.getComponentFromPoint(point, function () {
+                    return (this.tappable || this.holdable || this.movable);
+                });
                 if (component != null) {
                     point = component.point;
                     component = component.component;
