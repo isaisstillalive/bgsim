@@ -131,7 +131,11 @@
             options = {}
         }
 
-        this.size = new bgsim.Shape(options.width, options.height);
+        if (options.shape) {
+            this.shape = options.shape;
+        } else {
+            this.shape = new bgsim.Rectangle((options.width || 0), (options.height || 0));
+        }
         this.crip = new bgsim.Point(0, 0);
         this.image = this.loadImage(image);
         this.sprites = options.sprites || [1, 1];
@@ -140,10 +144,10 @@
             var self = this;
             var onload = function () {
                 if (!options.width) {
-                    self.size.width = this.width / self.sprites[0];
+                    self.shape.width = this.width / self.sprites[0];
                 }
                 if (!options.height) {
-                    self.size.height = this.height / self.sprites[1];
+                    self.shape.height = this.height / self.sprites[1];
                 }
             };
             if (this.image.complete) {
@@ -181,10 +185,10 @@
             var cripX = 0;
             var cripY = 0;
             if (sprite) {
-                cripX = this.size.width * (sprite % this.sprites[0]);
-                cripY = this.size.height * (Math.floor(sprite / this.sprites[0]) % this.sprites[1]);
+                cripX = this.shape.width * (sprite % this.sprites[0]);
+                cripY = this.shape.height * (Math.floor(sprite / this.sprites[0]) % this.sprites[1]);
             }
-            context.drawImage(this.image, cripX, cripY, this.size.width, this.size.height, -size.width/2, -size.height/2, size.width, size.height);
+            context.drawImage(this.image, cripX, cripY, this.shape.width, this.shape.height, -size.width/2, -size.height/2, size.width, size.height);
         };
     }
 
@@ -223,7 +227,7 @@
         if (options.shape) {
             this.shape = options.shape;
         } else {
-            this.shape = new bgsim.Shape((options.width || 0), (options.height || 0));
+            this.shape = new bgsim.Rectangle((options.width || 0), (options.height || 0));
         }
         this.zoom = options.zoom || 1;
         this.angle = options.angle || 0;
@@ -735,7 +739,7 @@
 
             var base_size = this.shape;
             this._image = image;
-            this.shape = image.size;
+            this.shape = image.shape;
             if (this.shape.width == undefined) {
                 this.shape.width = base_size.width;
             }
