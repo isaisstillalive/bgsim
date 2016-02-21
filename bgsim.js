@@ -434,6 +434,10 @@
         {
             var localPoint = this.getLocalPoint(point);
 
+            if (!this.visible) {
+                return;
+            }
+
             for (var i = this.children.length; i--;) {
                 var child = this.children[i];
                 if (child.floating) {
@@ -454,10 +458,6 @@
 
         bgsim.Component.prototype.within = function (point)
         {
-            if (!this.visible) {
-                return false;
-            }
-
             return this.shape.within(point);
         };
 
