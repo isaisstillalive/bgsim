@@ -1091,6 +1091,12 @@
     {
         util.inherits(bgsim.SortedArea, bgsim.Area);
 
+        bgsim.SortedArea.prototype.add_ = function(component)
+        {
+            bgsim.Area.prototype.add_.call(this, component);
+            this.reorder();
+        };
+
         bgsim.SortedArea.prototype.add = function (component, ratio)
         {
             if (component._parent != this) {
@@ -1102,12 +1108,13 @@
             } else if (ratio == 1) {
                 this.children.unshift(component);
                 this.trigger('added', component);
+                this.reorder();
             } else {
                 var index = Math.floor(this.children.length * (1-ratio));
                 this.children.splice(index, 0, component);
                 this.trigger('added', component);
+                this.reorder();
             }
-            this.reorder();
         };
 
         bgsim.SortedArea.prototype.remove_ = function(component)
