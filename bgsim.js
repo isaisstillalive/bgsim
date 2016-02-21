@@ -244,7 +244,7 @@
 
         this.name = options.name || 'null';
         this._player = options.player;
-        this.private = !!options.private;
+        this.private = options.private;
 
         if (options.location) {
             this.location = options.location;
@@ -357,6 +357,11 @@
                 var index = Math.floor(this.children.length * (1-ratio));
                 this.children.splice(index, 0, component);
             }
+
+            if (this.private != null) {
+                component.private = this.private;
+            }
+
             this.trigger('added', component);
         };
 
