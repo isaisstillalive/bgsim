@@ -347,9 +347,16 @@
             return this._parent;
         });
 
-        bgsim.Component.prototype.add_ = function (component)
+        bgsim.Component.prototype.add_ = function (component, ratio)
         {
-            this.children.push(component);
+            if (ratio == undefined || ratio == 0) {
+                this.children.push(component);
+            } else if (ratio == 1) {
+                this.children.unshift(component);
+            } else {
+                var index = Math.floor(this.children.length * (1-ratio));
+                this.children.splice(index, 0, component);
+            }
             this.trigger('added', component);
         };
 
@@ -1091,9 +1098,9 @@
     {
         util.inherits(bgsim.SortedArea, bgsim.Area);
 
-        bgsim.SortedArea.prototype.add_ = function(component)
+        bgsim.SortedArea.prototype.add_ = function(component, ratio)
         {
-            bgsim.Area.prototype.add_.call(this, component);
+            bgsim.Area.prototype.add_.call(this, component, ratio);
             this.reorder();
         };
 
@@ -1103,18 +1110,7 @@
                 component._parent.remove_(component);
             }
             component._parent = this;
-            if (ratio == undefined || ratio == 0) {
-                this.add_(component);
-            } else if (ratio == 1) {
-                this.children.unshift(component);
-                this.trigger('added', component);
-                this.reorder();
-            } else {
-                var index = Math.floor(this.children.length * (1-ratio));
-                this.children.splice(index, 0, component);
-                this.trigger('added', component);
-                this.reorder();
-            }
+            this.add_(component, ratio);
         };
 
         bgsim.SortedArea.prototype.remove_ = function(component)
@@ -1217,9 +1213,9 @@
             this.shuffle();
         };
 
-        bgsim.Deck.prototype.add_ = function(component)
+        bgsim.Deck.prototype.add_ = function(component, ratio)
         {
-            bgsim.SortedArea.prototype.add_.call(this, component);
+            bgsim.SortedArea.prototype.add_.call(this, component, ratio);
             if (this.back != null) {
                 component.back = this.back;
             }
@@ -1263,14 +1259,14 @@
             return (component.name == this.source.name);
         };
 
-        bgsim.Stock.prototype.add_ = function(component)
+        bgsim.Stock.prototype.add_ = function(component, ratio)
         {
             if (this.copying) {
-                bgsim.Area.prototype.add_.call(this, component);
+                bgsim.Area.prototype.add_.call(this, component, ratio);
             } else {
                 // 2枚目までは入れるが3枚目以降は消す
                 if (this.limit < 2) {
-                    bgsim.Area.prototype.add_.call(this, component);
+                    bgsim.Area.prototype.add_.call(this, component, ratio);
                     component.location.x = 0;
                     component.location.y = 0;
                 } else {
