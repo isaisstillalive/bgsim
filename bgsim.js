@@ -1175,14 +1175,21 @@
 
         bgsim.SortedArea.prototype.sort = function()
         {
-            this.children.sort(this.compare);
+            if (this._compare) {
+                this.children.sort(this._compare);
+            }
             this.reorder();
         };
 
-        bgsim.SortedArea.prototype.compare = function(a, b)
-        {
-            return 0;
-        };
+        bgsim.SortedArea.prototype.__defineGetter__('compare', function() {
+            return this.point._compare;
+        });
+
+        bgsim.SortedArea.prototype.__defineSetter__('compare', function(compare) {
+            this._compare = compare;
+            this.sort();
+            return this._compare;
+        });
     }
 
     // class Deck extends SortedArea
