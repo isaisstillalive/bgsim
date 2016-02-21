@@ -1101,7 +1101,7 @@
         bgsim.SortedArea.prototype.add_ = function(component, ratio)
         {
             bgsim.Area.prototype.add_.call(this, component, ratio);
-            this.reorder();
+            this.sort();
         };
 
         bgsim.SortedArea.prototype.add = function (component, ratio)
@@ -1116,7 +1116,7 @@
         bgsim.SortedArea.prototype.remove_ = function(component)
         {
             bgsim.Area.prototype.remove_.call(this, component);
-            this.reorder();
+            this.sort();
         };
 
         bgsim.SortedArea.prototype.reorder = function ()
