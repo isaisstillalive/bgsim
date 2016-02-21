@@ -1091,9 +1091,22 @@
     {
         util.inherits(bgsim.SortedArea, bgsim.Area);
 
-        bgsim.SortedArea.prototype.add = function(component)
+        bgsim.SortedArea.prototype.add = function (component, ratio)
         {
-            bgsim.Area.prototype.add.call(this, component);
+            if (component._parent != this) {
+                component._parent.remove(component);
+            }
+            component._parent = this;
+            if (ratio == undefined || ratio == 0) {
+                bgsim.Area.prototype.add.call(this, component);
+            } else if (ratio == 1) {
+                this.children.unshift(component);
+                this.trigger('added', component);
+            } else {
+                var index = Math.floor(this.children.length * (1-ratio));
+                this.children.splice(index, 0, component);
+                this.trigger('added', component);
+            }
             this.reorder();
         };
 
@@ -1197,9 +1210,9 @@
             this.shuffle();
         };
 
-        bgsim.Deck.prototype.add = function(component)
+        bgsim.Deck.prototype.add = function(component, ratio)
         {
-            bgsim.SortedArea.prototype.add.call(this, component);
+            bgsim.SortedArea.prototype.add.call(this, component, ratio);
             if (this.back != null) {
                 component.back = this.back;
             }
