@@ -320,8 +320,8 @@
         bgsim.Component.prototype.__defineSetter__('parent', function (parent) {
             if (this._parent == parent) {
                 if (parent) {
-                    parent.remove(this);
-                    parent.add(this);
+                    parent.remove_(this);
+                    parent.add_(this);
                 }
                 return parent;
             }
@@ -333,7 +333,7 @@
             var original_parent = this._parent;
 
             if (this._parent) {
-                this._parent.remove(this);
+                this._parent.remove_(this);
                 this.location = this._parent.getAllGlobalPoint(this.location);
             }
             this._parent = parent;
@@ -341,19 +341,19 @@
                 if (original_parent) {
                     this.location = parent.getAllLocalPoint(this.location);
                 }
-                parent.add(this);
+                parent.add_(this);
             }
 
             return this._parent;
         });
 
-        bgsim.Component.prototype.add = function (component)
+        bgsim.Component.prototype.add_ = function (component)
         {
             this.children.push(component);
             this.trigger('added', component);
         };
 
-        bgsim.Component.prototype.remove = function (component)
+        bgsim.Component.prototype.remove_ = function (component)
         {
             var index = this.children.indexOf(component);
             this.children.splice(index, 1);
@@ -1094,11 +1094,11 @@
         bgsim.SortedArea.prototype.add = function (component, ratio)
         {
             if (component._parent != this) {
-                component._parent.remove(component);
+                component._parent.remove_(component);
             }
             component._parent = this;
             if (ratio == undefined || ratio == 0) {
-                bgsim.Area.prototype.add.call(this, component);
+                this.add_(component);
             } else if (ratio == 1) {
                 this.children.unshift(component);
                 this.trigger('added', component);
@@ -1110,9 +1110,9 @@
             this.reorder();
         };
 
-        bgsim.SortedArea.prototype.remove = function(component)
+        bgsim.SortedArea.prototype.remove_ = function(component)
         {
-            bgsim.Area.prototype.remove.call(this, component);
+            bgsim.Area.prototype.remove_.call(this, component);
             this.reorder();
         };
 
@@ -1210,9 +1210,9 @@
             this.shuffle();
         };
 
-        bgsim.Deck.prototype.add = function(component, ratio)
+        bgsim.Deck.prototype.add_ = function(component)
         {
-            bgsim.SortedArea.prototype.add.call(this, component, ratio);
+            bgsim.SortedArea.prototype.add_.call(this, component);
             if (this.back != null) {
                 component.back = this.back;
             }
@@ -1256,14 +1256,14 @@
             return (component.name == this.source.name);
         };
 
-        bgsim.Stock.prototype.add = function(component)
+        bgsim.Stock.prototype.add_ = function(component)
         {
             if (this.copying) {
-                bgsim.Area.prototype.add.call(this, component);
+                bgsim.Area.prototype.add_.call(this, component);
             } else {
                 // 2枚目までは入れるが3枚目以降は消す
                 if (this.limit < 2) {
-                    bgsim.Area.prototype.add.call(this, component);
+                    bgsim.Area.prototype.add_.call(this, component);
                     component.location.x = 0;
                     component.location.y = 0;
                 } else {
@@ -1273,9 +1273,9 @@
             }
         };
 
-        bgsim.Stock.prototype.remove = function(component)
+        bgsim.Stock.prototype.remove_ = function(component)
         {
-            bgsim.Area.prototype.remove.call(this, component);
+            bgsim.Area.prototype.remove_.call(this, component);
 
             // 2枚以上残っていれば複製する
             this.limit--;
