@@ -121,7 +121,7 @@
         };
 
         bgsim.Rectangle.prototype.toString = function() {
-            return 'Rectangle' + bgsim.Rectangle.prototype.toString.call(this);
+            return 'Rectangle' + bgsim.Shape.prototype.toString.call(this);
         };
     }
 
@@ -138,7 +138,7 @@
         };
 
         bgsim.Circle.prototype.toString = function() {
-            return 'Circle' + bgsim.Rectangle.prototype.toString.call(this);
+            return 'Circle' + bgsim.Shape.prototype.toString.call(this);
         };
     }
 
