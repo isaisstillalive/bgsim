@@ -690,11 +690,13 @@
 
         bgsim.Component.prototype.sendEventTouchEnd = function (point)
         {
-            // タップ判定が継続したらタップ処理を行う
-            if (this.touchData.tapping) {
+            if (this.holdable) {
                 // ホールド判定を除去
                 window.clearTimeout(this.touchData.holding);
+            }
 
+            // タップ判定が継続したらタップ処理を行う
+            if (this.touchData.tapping) {
                 // ダブルタップ判定を行う
                 if (this.doubletappable) {
                     if (this.touchData.singletapping) {
