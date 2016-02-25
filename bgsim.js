@@ -672,7 +672,7 @@
             this.location.x = this.touchData.moving.x + point.x;
             this.location.y = this.touchData.moving.y + point.y;
             // 移動先がcontainableならフォーカスさせる
-            var gp = this.parent.getAllGlobalPoint(point);
+            var gp = this.getAllGlobalPoint(new bgsim.Point(0, 0));
             var self = this;
             var component = bgsim.Game.getComponentFromPoint(gp, function (component) {
                 return component.containable && component.allowContain(self);
