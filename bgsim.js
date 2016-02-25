@@ -700,18 +700,20 @@
 
             // タップ判定が継続したらタップ処理を行う
             if (this.touchData.tapping) {
-                // ダブルタップ判定を行う
-                if (this.doubletappable) {
-                    if (this.touchData.singletapping) {
-                        this.sendEventTouchFinishTrigger('doubletap');
+                if (this.within(this.getLocalPoint(point))) {
+                    // ダブルタップ判定を行う
+                    if (this.doubletappable) {
+                        if (this.touchData.singletapping) {
+                            this.sendEventTouchFinishTrigger('doubletap');
+                        } else {
+                            var self = this;
+                            this.touchData.singletapping = window.setTimeout(function(){
+                                self.sendEventTouchFinishTrigger('tap');
+                            }, 300);
+                        }
                     } else {
-                        var self = this;
-                        this.touchData.singletapping = window.setTimeout(function(){
-                            self.sendEventTouchFinishTrigger('tap');
-                        }, 300);
+                        this.sendEventTouchFinishTrigger('tap');
                     }
-                } else {
-                    this.sendEventTouchFinishTrigger('tap');
                 }
             } else if (this.touchData.moving) {
                 this.trigger('dragend');
