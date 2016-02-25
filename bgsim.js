@@ -1182,6 +1182,10 @@
 
         bgsim.SortedArea.prototype.sort = function()
         {
+            if (!this.order) {
+                return;
+            }
+
             if (this._compare) {
                 this.children.sort(this._compare);
             }
