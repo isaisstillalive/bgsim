@@ -677,12 +677,14 @@
             var component = bgsim.Game.getComponentFromPoint(gp, function (component) {
                 return component.containable && component.allowContain(self);
             });
+            if (this.touchData.focused) {
+                this.touchData.focused.focus = false;
+            }
             if (component) {
-                if (this.touchData.focused) {
-                    this.touchData.focused.focus = false;
-                }
                 component.component.focus = true;
                 this.touchData.focused = component.component;
+            } else {
+                this.touchData.focused = null;
             }
 
             return;
