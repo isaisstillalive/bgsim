@@ -626,6 +626,7 @@
 
             // 移動判定用の基準を求める
             if (this.movable) {
+                this.touchData.movecancel = new bgsim.Point(this.location.x, this.location.y);
                 this.touchData.moving = {
                     x: this.location.x - point.x,
                     y: this.location.y - point.y,
@@ -718,6 +719,8 @@
                 if (this.touchData.focused) {
                     this.parent = this.touchData.focused;
                     this.touchData.focused.focus = false;
+                } else {
+                    this.location = this.touchData.movecancel;
                 }
             }
 
@@ -1398,7 +1401,7 @@
 
         Game.prototype.within = function (point)
         {
-            return true;
+            return false;
         };
 
         Game.prototype.touchEventSender = function (e)
