@@ -358,6 +358,10 @@
                 this.children.splice(index, 0, component);
             }
 
+            this.addEvent_(component);
+        };
+        bgsim.Component.prototype.addEvent_ = function (component)
+        {
             if (this.private != null) {
                 component.private = this.private;
             }
@@ -735,7 +739,7 @@
                     this.touchData.focused.focus = false;
                 } else {
                     this.location = this.touchData.movecancel;
-                    this.parent = this.parent;
+                    this.parent.addEvent_(this);
                 }
             }
 
