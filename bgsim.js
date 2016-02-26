@@ -723,6 +723,7 @@
                     this.touchData.focused.focus = false;
                 } else {
                     this.location = this.touchData.movecancel;
+                    this.parent = this.parent;
                 }
             }
 
