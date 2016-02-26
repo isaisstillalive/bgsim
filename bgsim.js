@@ -1339,12 +1339,19 @@
     {
         util.inherits(Game, bgsim.Component);
 
-        Game.prototype.start = function (div, init)
+        Game.prototype.start = function (div, options, init)
         {
             var style_width = window.innerWidth + 'px';
             var style_height = window.innerHeight + 'px';
-            var canvas_width = window.innerWidth * window.devicePixelRatio;
-            var canvas_height = window.innerHeight * window.devicePixelRatio;
+            this.canvas_width = window.innerWidth * window.devicePixelRatio;
+            this.canvas_height = window.innerHeight * window.devicePixelRatio;
+
+            // // 論理サイズ
+            this.shape.width = options.width || 768;
+            this.shape.height = options.height || 1024;
+            this.location.x = this.canvas_width/2;
+            this.location.y = this.canvas_height/2;
+            this.zoom = this.canvas_width/this.shape.width;
 
             // 画像レイヤーを4枚作成
             // 0.背景、1.ボード、2.カード、3.ドラッグ用を想定
@@ -1353,8 +1360,8 @@
             for (var i = 0; i < 4; i++) {
                 var layer = document.createElement('canvas');
                 div.appendChild(layer);
-                layer.width = canvas_width;
-                layer.height = canvas_height;
+                layer.width = this.canvas_width;
+                layer.height = this.canvas_height;
                 layer.style.width = style_width;
                 layer.style.height = style_height;
                 layer.style.position = 'absolute';
@@ -1365,12 +1372,7 @@
                 this.contexts.push(layer.getContext('2d'));
             };
 
-            this.zoom = window.devicePixelRatio/2;
             this.listeningComponent = {};
-            this.location.x = canvas_width/2;
-            this.location.y = canvas_height/2;
-            this.shape.width = canvas_width;
-            this.shape.height = canvas_height;
 
             var events = [];
             if (util.isTouch) {
@@ -1406,7 +1408,7 @@
         Game.prototype.draw = function ()
         {
             for (var i = 0; i < this.contexts.length; i++) {
-                this.contexts[i].clearRect(0, 0, this.shape.width, this.shape.height);
+                this.contexts[i].clearRect(0, 0, this.canvas_width, this.canvas_height);
             }
             bgsim.Component.prototype.draw.call(this, this.contexts);
 
