@@ -1341,17 +1341,9 @@
 
         Game.prototype.start = function (div, options, init)
         {
-            var style_width = window.innerWidth + 'px';
-            var style_height = window.innerHeight + 'px';
-            this.canvas_width = window.innerWidth * window.devicePixelRatio;
-            this.canvas_height = window.innerHeight * window.devicePixelRatio;
-
-            // // 論理サイズ
+            // 論理サイズを設定
             this.shape.width = options.width || 768;
             this.shape.height = options.height || 1024;
-            this.location.x = this.canvas_width/2;
-            this.location.y = this.canvas_height/2;
-            this.zoom = this.canvas_width/this.shape.width;
 
             // 画像レイヤーを4枚作成
             // 0.背景、1.ボード、2.カード、3.ドラッグ用を想定
@@ -1360,10 +1352,6 @@
             for (var i = 0; i < 4; i++) {
                 var layer = document.createElement('canvas');
                 div.appendChild(layer);
-                layer.width = this.canvas_width;
-                layer.height = this.canvas_height;
-                layer.style.width = style_width;
-                layer.style.height = style_height;
                 layer.style.position = 'absolute';
                 layer.style.display = 'block';
                 layer.style.backgroundColor = 'transparent';
@@ -1371,6 +1359,36 @@
                 this.layers.push(layer);
                 this.contexts.push(layer.getContext('2d'));
             };
+
+            // キャンバスを現在のサイズに調整
+            var game = this;
+            var resized = function () {
+                var style_width = window.innerWidth + 'px';
+                var style_height = window.innerHeight + 'px';
+                game.canvas_width = window.innerWidth * window.devicePixelRatio;
+                game.canvas_height = window.innerHeight * window.devicePixelRatio;
+
+                game.location.x = game.canvas_width/2;
+                game.location.y = game.canvas_height/2;
+                game.zoom = game.canvas_width/game.shape.width;
+
+                for (var i = game.layers.length; i--;) {
+                    var layer = game.layers[i];
+                    layer.style.width = style_width;
+                    layer.style.height = style_height;
+                    layer.width = game.canvas_width;
+                    layer.height = game.canvas_height;
+                }
+            }
+
+            resized();
+            var resizing;
+            window.addEventListener('resize', function () {
+                if (resizing) {
+                    window.clearTimeout(resizing);
+                }
+                resizing = window.setTimeout(resized, 30);
+            })
 
             this.listeningComponent = {};
 
