@@ -1374,7 +1374,13 @@
 
                 game.location.x = game.canvas_width/2;
                 game.location.y = game.canvas_height/2;
-                game.zoom = game.canvas_width/game.shape.width;
+
+                // 短い方を合わせる
+                if (game.canvas_width >= game.canvas_height) {
+                    game.zoom = game.canvas_height/game.shape.height;
+                } else {
+                    game.zoom = game.canvas_width/game.shape.width;
+                }
 
                 for (var i = game.layers.length; i--;) {
                     var layer = game.layers[i];
