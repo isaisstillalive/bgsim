@@ -649,7 +649,7 @@
                 };
 
                 // タップが無効なら即座に移動判定開始
-                if (!this.tappable) {
+                if (!this.tappable && !this.holdable) {
                     this.sendEventTouchDragStart();
                 }
 
@@ -672,13 +672,12 @@
             }
 
             // タップ判定中ならば、移動しているかどうかを調べる
-            if (this.touchData.tapping) {
+            if (this.touchData.tapping || this.touchData.holding) {
                 // 移動したらタップ判定を終了し、移動判定開始
-                this.touchData.tapping = (
+                if ((
                     Math.abs(this.touchData.moving.x - (this.location.x - point.x)) <= 15 &&
                     Math.abs(this.touchData.moving.y - (this.location.y - point.y)) <= 15
-                );
-                if (this.touchData.tapping) {
+                )) {
                     return;
                 } else {
                     this.sendEventTouchDragStart();
@@ -751,6 +750,8 @@
 
         bgsim.Component.prototype.sendEventTouchDragStart = function () {
             this.floating = true;
+            
+            this.touchData.tapping = null;
 
             window.clearTimeout(this.touchData.holding);
             this.touchData.holding = null;
