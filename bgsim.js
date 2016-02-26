@@ -430,27 +430,39 @@
             return contexts[this.getLayer(contexts)];
         }
 
-        bgsim.Component.prototype.getComponentFromPoint = function (point, callback)
+        bgsim.Component.prototype.getComponentFromPoint = function (point, callback, currentLayer)
         {
+            if (currentLayer === undefined) {
+                currentLayer = -1;
+            }
             var localPoint = this.getLocalPoint(point);
 
             if (!this.visible) {
                 return;
             }
 
+            var component;
             for (var i = this.children.length; i--;) {
                 var child = this.children[i];
                 if (child.floating) {
                     continue;
                 }
-                var component = child.getComponentFromPoint(localPoint, callback);
-                if (component != null) {
-                    return component;
+                var result = child.getComponentFromPoint(localPoint, callback, currentLayer);
+                if (result == null) {
+                    continue;
+                }
+                if (result.layer > currentLayer) {
+                    currentLayer = result.layer;
+                    component = result;
                 }
             }
+            if (component != null) {
+                return component;
+            }
 
-            if (this.within(localPoint) && (!callback || callback.call(this, this))) {
-                return {component: this, point: point};
+            var layer = this.getLayer();
+            if (this.within(localPoint) && layer > currentLayer && (!callback || callback.call(this, this))) {
+                return {component: this, point: point, layer: layer};
             }
 
             return;
